@@ -66,31 +66,10 @@ export default function LandingPage() {
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-
-              {/* High Trust Proof */}
-              <div className="pt-8 flex flex-col md:flex-row items-center gap-8 opacity-80">
-                <div className="flex items-center gap-1.5">
-                  <div className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="w-3.5 h-3.5 text-amber-400 fill-current" />
-                    ))}
-                  </div>
-                  <span className="text-xs font-bold text-[#111827]">4.9/5 Rating</span>
-                </div>
-                <div className="h-3 w-px bg-gray-200 hidden md:block"></div>
-                <p className="max-w-[300px] text-[10px] font-semibold text-gray-600 leading-relaxed uppercase tracking-widest">
-                  Aplikasi pencatat keuangan pintar untuk memonitor pengeluaran dan pemasukan Anda.
-                </p>
-              </div>
             </div>
 
             {/* Right Column (Visual Mockup) */}
             <div className="lg:col-span-5 space-y-8 relative">
-              <div className="space-y-4">
-                <p className="text-sm md:text-base font-medium text-[#6B7280] leading-relaxed italic border-l-4 border-blue-100 pl-5">
-                  "Hematyu membantu Anda mencatat pengeluaran, menyusun anggaran, dan mencapai tujuan finansial tanpa pusing."
-                </p>
-              </div>
 
               <div className="relative pt-4">
                 {/* Decorative Elements */}
