@@ -21,16 +21,11 @@ export function SiteFooter({ author }: SiteFooterProps) {
             <p className="text-sm font-medium text-[#6B7280] leading-relaxed">
               Misi kami adalah membantu 1 juta orang Indonesia mencapai kebebasan finansial melalui pengelolaan uang yang cerdas dan menyenangkan.
             </p>
-            <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-[#6B7280]">
-              <Link href="#" className="hover:text-primary transition-colors">Instagram</Link>
-              <Link href="#" className="hover:text-primary transition-colors">Twitter</Link>
-              <Link href="#" className="hover:text-primary transition-colors">Github</Link>
-            </div>
           </div>
 
           {/* Links Columns */}
           <div className="space-y-6">
-            <h4 className="font-bold text-[#1E1B4B]">Produk</h4>
+            <h3 className="font-bold text-[#1E1B4B]">Produk</h3>
             <ul className="space-y-4 text-sm font-medium text-[#6B7280]">
               <li><Link href="#" className="hover:text-primary transition-colors">Fitur Utama</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">Update Terbaru</Link></li>
@@ -40,7 +35,7 @@ export function SiteFooter({ author }: SiteFooterProps) {
           </div>
 
           <div className="space-y-6">
-            <h4 className="font-bold text-[#1E1B4B]">Perusahaan</h4>
+            <h3 className="font-bold text-[#1E1B4B]">Perusahaan</h3>
             <ul className="space-y-4 text-sm font-medium text-[#6B7280]">
               <li><Link href="/about" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
               <li><Link href="/careers" className="hover:text-primary transition-colors">Karir</Link></li>
@@ -50,7 +45,7 @@ export function SiteFooter({ author }: SiteFooterProps) {
           </div>
 
           <div className="space-y-6">
-            <h4 className="font-bold text-[#1E1B4B]">Bantuan</h4>
+            <h3 className="font-bold text-[#1E1B4B]">Bantuan</h3>
             <ul className="space-y-4 text-sm font-medium text-[#6B7280]">
               <li><Link href="/help-center" className="hover:text-primary transition-colors">Pusat Bantuan</Link></li>
               <li><Link href="/user-guide" className="hover:text-primary transition-colors">Panduan User</Link></li>

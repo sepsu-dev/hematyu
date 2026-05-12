@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun } from "lucide-react";
+import { Menu, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Highlighter } from "./highlighter";
 import { Logo } from "./logo";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 interface SiteHeaderProps {
   name: string;
@@ -50,18 +52,47 @@ export function SiteHeader({ name }: SiteHeaderProps) {
           </button>
           */}
 
-          <Link
-            href="/login"
-            className="hidden sm:inline-flex px-6 py-2.5 rounded-xl border border-gray-100 text-sm font-bold text-[#111827] hover:bg-gray-50 transition-all"
-          >
-            Masuk
+          <Link href="/login" className="hidden sm:inline-flex">
+            <Button variant="outline" className="px-6 py-5 rounded-xl border-gray-100 text-sm font-bold text-[#111827] hover:bg-gray-50 transition-all">
+              Masuk
+            </Button>
           </Link>
-          <Link
-            href="/register"
-            className="px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-blue-100 hover:scale-105 active:scale-95 transition-all"
-          >
-            Daftar
+          <Link href="/register" className="hidden sm:inline-flex">
+            <Button className="px-6 py-5 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-blue-100 hover:scale-105 active:scale-95 transition-all">
+              Daftar
+            </Button>
           </Link>
+
+          {/* Mobile Menu */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="lg:hidden text-gray-500 hover:bg-gray-50 rounded-xl">
+                <Menu className="h-6 w-6" strokeWidth={2.5} />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetTitle className="sr-only">Menu Navigasi</SheetTitle>
+              <SheetDescription className="sr-only">
+                Navigasi utama situs web Hematyu.
+              </SheetDescription>
+              <nav className="flex flex-col gap-6 mt-8">
+                <Link href="#tentang" className="text-base font-semibold text-[#6B7280] hover:text-primary">Beranda</Link>
+                <Link href="#fitur" className="text-base font-semibold text-[#6B7280] hover:text-primary">Fitur</Link>
+                <Link href="#demo" className="text-base font-semibold text-[#6B7280] hover:text-primary">Cara Kerja</Link>
+                <Link href="#harga" className="text-base font-semibold text-[#6B7280] hover:text-primary">Paket Harga</Link>
+                <hr className="my-2 border-gray-100" />
+                <div className="flex flex-col gap-3">
+                  <Link href="/login" className="w-full">
+                    <Button variant="outline" className="w-full justify-center py-6 rounded-xl border-gray-200">Masuk</Button>
+                  </Link>
+                  <Link href="/register" className="w-full">
+                    <Button className="w-full justify-center py-6 rounded-xl shadow-md">Daftar</Button>
+                  </Link>
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

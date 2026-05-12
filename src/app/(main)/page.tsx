@@ -78,7 +78,7 @@ export default function LandingPage() {
                   <span className="text-xs font-bold text-[#111827]">4.9/5 Rating</span>
                 </div>
                 <div className="h-3 w-px bg-gray-200 hidden md:block"></div>
-                <p className="max-w-[300px] text-[10px] font-semibold text-gray-400 leading-relaxed uppercase tracking-widest">
+                <p className="max-w-[300px] text-[10px] font-semibold text-gray-600 leading-relaxed uppercase tracking-widest">
                   Aplikasi pencatat keuangan pintar untuk memonitor pengeluaran dan pemasukan Anda.
                 </p>
               </div>
@@ -148,7 +148,7 @@ export default function LandingPage() {
                       { label: 'Tagihan', val: 'Lunas' },
                     ].map((item, i) => (
                       <div key={i} className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-gray-100 shadow-sm space-y-2 hover:-translate-y-1 transition-all">
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{item.label}</p>
+                        <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{item.label}</p>
                         <p className="text-xs font-bold text-[#111827]">{item.val}</p>
                       </div>
                     ))}
@@ -267,9 +267,9 @@ export default function LandingPage() {
                     <s.icon className="w-9 h-9" />
                   </div>
                   <div className="space-y-3">
-                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{s.tag}</p>
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">{s.tag}</p>
                     <h3 className="text-xl md:text-2xl font-bold text-[#111827] group-hover:text-primary transition-colors">{s.title}</h3>
-                    <p className="text-[#6B7280] text-sm md:text-base font-medium leading-relaxed px-4 opacity-80">
+                    <p className="text-[#6B7280] text-sm md:text-base font-medium leading-relaxed px-4">
                       {s.desc}
                     </p>
                   </div>
@@ -296,7 +296,7 @@ export default function LandingPage() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-xl font-bold text-[#111827]">Pemula</h3>
-                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">Selalu Gratis</p>
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Selalu Gratis</p>
                   </div>
                   <div className="text-3xl font-bold text-[#111827]">Rp 0</div>
                   <ul className="space-y-3 pt-2">
@@ -319,9 +319,9 @@ export default function LandingPage() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-xl font-bold text-[#111827]">Pro</h3>
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Langganan Bulanan</p>
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Langganan Bulanan</p>
                   </div>
-                  <div className="text-3xl font-bold text-[#111827]">Rp 29k <span className="text-sm text-gray-400">/bln</span></div>
+                  <div className="text-3xl font-bold text-[#111827]">Rp 29k <span className="text-sm text-gray-600">/bln</span></div>
                   <ul className="space-y-3 pt-2">
                     {["Bebas Iklan", "Sinkronisasi Cloud", "Ekspor Laporan", "Target Unlimit"].map((item, i) => (
                       <li key={i} className="flex items-center gap-2.5 text-[11px] font-bold text-[#6B7280]">
@@ -341,7 +341,7 @@ export default function LandingPage() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-xl font-bold text-[#111827]">Seumur Hidup</h3>
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Sekali Bayar</p>
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Sekali Bayar</p>
                   </div>
                   <div className="text-3xl font-bold text-[#111827]">Rp 499k</div>
                   <ul className="space-y-3 pt-2">
@@ -379,13 +379,13 @@ export default function LandingPage() {
                         <Star key={s} className="w-3.5 h-3.5 text-amber-400 fill-current" />
                       ))}
                     </div>
-                    <p className="text-base font-medium text-[#111827] italic leading-relaxed opacity-80">"{r.text}"</p>
+                    <p className="text-base font-medium text-[#111827] italic leading-relaxed">"{r.text}"</p>
                   </div>
                   <div className="flex items-center gap-4 mt-10">
                     <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${r.name}`} className="w-10 h-10 rounded-lg border-2 border-white shadow-xl group-hover:scale-110 transition-transform" alt="avatar" />
                     <div className="text-left">
-                      <h4 className="font-bold text-xs text-[#111827]">{r.name}</h4>
-                      <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{r.job}</p>
+                      <h3 className="font-bold text-xs text-[#111827]">{r.name}</h3>
+                      <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{r.job}</p>
                     </div>
                   </div>
                 </div>
