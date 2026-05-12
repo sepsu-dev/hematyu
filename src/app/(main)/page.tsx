@@ -23,15 +23,15 @@ export default function LandingPage() {
                   <p className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em]">Atur Keuangan Lebih Cerdas</p>
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] text-[#111827]">
+                <h1 className="text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] md:leading-[1.05] text-[#111827]">
                   <span className="relative inline-block z-0">
                     Kelola Uangmu,
-                    <Highlighter variant={2} className="text-emerald-300/60 translate-y-3" strokeWidth={3} />
+                    <Highlighter variant={2} className="text-emerald-300/60 translate-y-2 md:translate-y-3" strokeWidth={3} />
                   </span> <br />
-                  <span className="text-primary relative inline-block z-0 mt-2">
+                  <span className="text-primary relative inline-block z-0 mt-1 md:mt-2">
                     Wujudkan
                   </span> <br />
-                  <span className="relative inline-block z-0 mt-2">
+                  <span className="relative inline-block z-0 mt-1 md:mt-2">
                     Mimpi.
                   </span>
                 </h1>
@@ -125,7 +125,7 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               {/* Feature 1 - Manajemen Transaksi */}
-              <div className="md:col-span-8 p-10 bg-gradient-to-br from-[#EFF6FF] to-white rounded-2xl space-y-10 group overflow-hidden relative shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-100 transition-all duration-700">
+              <div className="md:col-span-8 p-6 sm:p-10 bg-gradient-to-br from-[#EFF6FF] to-white rounded-2xl space-y-10 group overflow-hidden relative shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-100 transition-all duration-700">
                 <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 transition-transform duration-1000">
                   <Receipt className="w-64 h-64 text-blue-600" />
                 </div>
@@ -157,7 +157,7 @@ export default function LandingPage() {
               </div>
 
               {/* Feature 2 - Planning */}
-              <div className="md:col-span-4 p-10 bg-[#FEF08A] rounded-2xl space-y-10 flex flex-col justify-between shadow-sm border border-white relative overflow-hidden group hover:shadow-xl transition-all duration-700">
+              <div className="md:col-span-4 p-6 sm:p-10 bg-[#FEF08A] rounded-2xl space-y-10 flex flex-col justify-between shadow-sm border border-white relative overflow-hidden group hover:shadow-xl transition-all duration-700">
                 <div className="absolute -top-10 -right-10 w-48 h-48 text-amber-700/10 rotate-45 group-hover:rotate-[60deg] transition-transform duration-1000">
                   <Calendar className="w-full h-full fill-current" />
                 </div>
@@ -182,7 +182,7 @@ export default function LandingPage() {
               </div>
 
               {/* Feature 3 - Alerts */}
-              <div className="md:col-span-4 p-10 bg-[#F3F4F6] rounded-2xl space-y-8 shadow-sm border border-gray-100 relative overflow-hidden group hover:bg-white hover:shadow-xl transition-all duration-700">
+              <div className="md:col-span-4 p-6 sm:p-10 bg-[#F3F4F6] rounded-2xl space-y-8 shadow-sm border border-gray-100 relative overflow-hidden group hover:bg-white hover:shadow-xl transition-all duration-700">
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center border border-gray-200 shadow-sm">
                   <BellRing className="w-6 h-6 text-gray-500" />
                 </div>
@@ -195,7 +195,7 @@ export default function LandingPage() {
               </div>
 
               {/* Feature 4 - Security */}
-              <div className="md:col-span-8 p-10 bg-[#111827] text-white rounded-2xl flex flex-col md:flex-row items-center gap-12 shadow-2xl border border-white/10 relative overflow-hidden group">
+              <div className="md:col-span-8 p-6 sm:p-10 bg-[#111827] text-white rounded-2xl flex flex-col md:flex-row items-center gap-12 shadow-2xl border border-white/10 relative overflow-hidden group">
                 <div className="flex-1 space-y-6 relative z-10">
                   <h3 className="text-3xl font-bold tracking-tight">Aman dan Terenkripsi</h3>
                   <p className="text-blue-200/80 font-medium text-base leading-relaxed">
@@ -372,7 +372,7 @@ export default function LandingPage() {
                 { name: "Siska Amelia", text: "Suka banget sama fitur target budgetnya. Notifikasinya sangat membantu buat ngerem kalau lagi boros jajan.", job: "Freelancer", color: "bg-[#FEF08A]/20" },
                 { name: "Rian Hidayat", text: "Laporannya visual dan mudah dibaca. Mengatur keuangan keluarga jadi jauh lebih praktis dan transparan.", job: "Wiraswasta", color: "bg-[#F3F4F6]" }
               ].map((r, i) => (
-                <div key={i} className={`p-10 rounded-2xl flex-1 ${r.color} shadow-sm border border-white flex flex-col justify-between hover:-translate-y-2 transition-all duration-500 hover:shadow-xl group`}>
+                <div key={i} className={`p-6 sm:p-10 rounded-2xl flex-1 ${r.color} shadow-sm border border-white flex flex-col justify-between hover:-translate-y-2 transition-all duration-500 hover:shadow-xl group`}>
                   <div className="space-y-6 text-left">
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((s) => (
@@ -396,7 +396,7 @@ export default function LandingPage() {
 
         {/* Final CTA */}
         <section className="py-24 px-6 md:px-12 text-center bg-white relative">
-          <div className="max-w-7xl mx-auto p-16 md:p-24 rounded-3xl bg-gradient-to-br from-[#111827] to-[#111827] space-y-12 relative overflow-hidden shadow-2xl group border border-white/5">
+          <div className="max-w-7xl mx-auto p-8 sm:p-16 md:p-24 rounded-3xl bg-gradient-to-br from-[#111827] to-[#111827] space-y-12 relative overflow-hidden shadow-2xl group border border-white/5">
             <div className="relative z-10 space-y-8">
               <div className="w-16 h-16 rounded-xl border border-white/20 flex items-center justify-center shadow-2xl mx-auto mb-6">
                 <Heart className="w-8 h-8 text-rose-400 fill-current" />

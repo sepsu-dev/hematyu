@@ -71,26 +71,76 @@ export function SiteHeader({ name }: SiteHeaderProps) {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <SheetTitle className="sr-only">Menu Navigasi</SheetTitle>
-              <SheetDescription className="sr-only">
-                Navigasi utama situs web Hematyu.
-              </SheetDescription>
-              <nav className="flex flex-col gap-6 mt-8">
-                <Link href="#tentang" className="text-base font-semibold text-[#6B7280] hover:text-primary">Beranda</Link>
-                <Link href="#fitur" className="text-base font-semibold text-[#6B7280] hover:text-primary">Fitur</Link>
-                <Link href="#demo" className="text-base font-semibold text-[#6B7280] hover:text-primary">Cara Kerja</Link>
-                <Link href="#harga" className="text-base font-semibold text-[#6B7280] hover:text-primary">Paket Harga</Link>
-                <hr className="my-2 border-gray-100" />
-                <div className="flex flex-col gap-3">
-                  <Link href="/login" className="w-full">
-                    <Button variant="outline" className="w-full justify-center py-6 rounded-xl border-gray-200">Masuk</Button>
-                  </Link>
-                  <Link href="/register" className="w-full">
-                    <Button className="w-full justify-center py-6 rounded-xl shadow-md">Daftar</Button>
-                  </Link>
+            <SheetContent side="right" className="w-[320px] sm:w-[400px] p-0 border-l-0">
+              <div className="h-full flex flex-col bg-white relative overflow-hidden">
+                {/* Decorative Background for Mobile Menu */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -z-10 rounded-full"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50/50 blur-3xl -z-10 rounded-full"></div>
+
+                <div className="p-8 border-b border-gray-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <Logo className="h-9" />
+                    <SheetTitle className="sr-only">Menu Navigasi</SheetTitle>
+                  </div>
+                  <SheetDescription className="text-xs font-medium text-[#6B7280]">
+                    Kelola uangmu, wujudkan mimpi.
+                  </SheetDescription>
                 </div>
-              </nav>
+
+                <nav className="flex-1 px-4 py-8 flex flex-col gap-2">
+                  <Link 
+                    href="#tentang" 
+                    className="flex items-center justify-between px-4 py-4 text-base font-bold text-[#111827] hover:bg-gray-50 rounded-2xl transition-all group"
+                  >
+                    <span>Beranda</span>
+                    <div className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+                    </div>
+                  </Link>
+                  <Link 
+                    href="#fitur" 
+                    className="flex items-center justify-between px-4 py-4 text-base font-bold text-[#111827] hover:bg-gray-50 rounded-2xl transition-all group"
+                  >
+                    <span>Fitur</span>
+                    <div className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+                    </div>
+                  </Link>
+                  <Link 
+                    href="#demo" 
+                    className="flex items-center justify-between px-4 py-4 text-base font-bold text-[#111827] hover:bg-gray-50 rounded-2xl transition-all group"
+                  >
+                    <span>Cara Kerja</span>
+                    <div className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+                    </div>
+                  </Link>
+                  <Link 
+                    href="#harga" 
+                    className="flex items-center justify-between px-4 py-4 text-base font-bold text-[#111827] hover:bg-gray-50 rounded-2xl transition-all group"
+                  >
+                    <span>Paket Harga</span>
+                    <div className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+                    </div>
+                  </Link>
+                </nav>
+
+                <div className="p-8 bg-gray-50/50 border-t border-gray-50">
+                  <div className="flex flex-col gap-3">
+                    <Link href="/login" className="w-full">
+                      <Button variant="outline" className="w-full justify-center h-14 rounded-2xl border-gray-200 text-sm font-bold bg-white hover:bg-gray-50 transition-all">
+                        Masuk
+                      </Button>
+                    </Link>
+                    <Link href="/register" className="w-full">
+                      <Button className="w-full justify-center h-14 rounded-2xl bg-primary text-white text-sm font-bold shadow-lg shadow-blue-100 hover:scale-[1.02] active:scale-95 transition-all">
+                        Daftar
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
