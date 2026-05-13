@@ -23,7 +23,7 @@ export function Pricing() {
               </div>
               <div className="text-3xl font-bold text-[#111827]">Rp 0</div>
               <ul className="space-y-3 pt-2">
-                {["Catat Transaksi", "Laporan Mingguan", "Data Lokal Aman"].map((item, i) => (
+                {["Pencatatan via Chat", "3 Kategori Anggaran", "Laporan Dasar", "Kalkulator Zakat"].map((item, i) => (
                   <li key={i} className="flex items-center gap-2.5 text-[11px] font-bold text-[#6B7280]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
                     {item}
@@ -46,7 +46,7 @@ export function Pricing() {
               </div>
               <div className="text-3xl font-bold text-[#111827]">Rp 29k <span className="text-sm text-gray-600">/bln</span></div>
               <ul className="space-y-3 pt-2">
-                {["Bebas Iklan", "Sinkronisasi Cloud", "Ekspor Laporan", "Target Unlimit"].map((item, i) => (
+                {["Chat AI Tanpa Batas", "Pemindaian Struk (OCR)", "Analisis Mendalam", "Prediksi Pengeluaran"].map((item, i) => (
                   <li key={i} className="flex items-center gap-2.5 text-[11px] font-bold text-[#6B7280]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
                     {item}
@@ -68,7 +68,7 @@ export function Pricing() {
               </div>
               <div className="text-3xl font-bold text-[#111827]">Rp 499k</div>
               <ul className="space-y-3 pt-2">
-                {["Ekosistem Penuh", "Sekali Bayar", "Update Eksklusif", "Akses VIP"].map((item, i) => (
+                {["Berbagi Akun Keluarga", "Mode Syariah Lengkap", "Deteksi Produk Halal", "Prioritas Layanan"].map((item, i) => (
                   <li key={i} className="flex items-center gap-2.5 text-[11px] font-bold text-[#6B7280]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
                     {item}

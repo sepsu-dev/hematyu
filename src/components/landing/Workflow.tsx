@@ -16,25 +16,25 @@ export function Workflow() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
           {[
             {
-              title: "1. Catat Harian",
-              desc: "Masukkan setiap transaksi Anda. Semudah mengirim pesan.",
+              title: "1. Registrasi Akun",
+              desc: "Buat akun dengan mudah dan sambungkan dengan layanan favorit Anda.",
               icon: MousePointerClick,
               color: "border-blue-200 text-blue-600",
-              tag: "Tahap 01"
+              tag: "Langkah 01"
             },
             {
-              title: "2. Pantau Pengeluaran",
-              desc: "Lihat laporan visual yang jelas untuk tahu kemana uang Anda pergi setiap bulannya.",
+              title: "2. Catat Transaksi",
+              desc: "Ketik, kirim foto struk, atau input langsung pengeluaran Anda kapan saja.",
               icon: SearchCheck,
               color: "border-primary/20 text-primary",
-              tag: "Tahap 02"
+              tag: "Langkah 02"
             },
             {
-              title: "3. Capai Target",
-              desc: "Ikuti rekomendasi anggaran dan capai target tabungan Anda dengan lebih cepat.",
+              title: "3. Pantau Hasilnya",
+              desc: "Dapatkan analisis rutin dan saran personal untuk keuangan yang lebih sehat.",
               icon: TrendingUp,
               color: "border-blue-200 text-blue-600",
-              tag: "Tahap 03"
+              tag: "Langkah 03"
             }
           ].map((s, i) => (
             <div key={i} className="flex flex-col items-center text-center space-y-6 group">

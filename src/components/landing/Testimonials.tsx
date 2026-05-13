@@ -12,9 +12,9 @@ export function Testimonials() {
 
         <div className="grid grid-cols-1 md:flex-row md:flex gap-8">
           {[
-            { name: "Andi Saputra", text: "Aplikasinya gampang banget dipake! Sekarang aku tahu pasti ke mana aja gajiku tiap bulan. Bye-bye pengeluaran ga jelas!", job: "Karyawan Swasta", color: "bg-[#EFF6FF]" },
-            { name: "Siska Amelia", text: "Suka banget sama fitur target budgetnya. Notifikasinya sangat membantu buat ngerem kalau lagi boros jajan.", job: "Freelancer", color: "bg-[#FEF08A]/20" },
-            { name: "Rian Hidayat", text: "Laporannya visual dan mudah dibaca. Mengatur keuangan keluarga jadi jauh lebih praktis dan transparan.", job: "Wiraswasta", color: "bg-[#F3F4F6]" }
+            { name: "Andi Saputra", text: "Fitur AI Roast-nya lucu banget! Jadi malu sendiri kalau mau boros kopi. Tapi beneran ngebantu banget buat nabung.", job: "Karyawan Swasta", color: "bg-[#EFF6FF]" },
+            { name: "Siska Amelia", text: "Scan struk belanjanya juara. Gak perlu capek ngetik lagi, tinggal foto langsung kecatat otomatis.", job: "Freelancer", color: "bg-[#FEF08A]/20" },
+            { name: "Rian Hidayat", text: "Mengatur budget keluarga jadi transparan. Istri juga bisa pantau lewat WhatsApp. Sangat membantu!", job: "Wiraswasta", color: "bg-[#F3F4F6]" }
           ].map((r, i) => (
             <div key={i} className={`p-6 sm:p-10 rounded-2xl flex-1 ${r.color} shadow-sm border border-white flex flex-col justify-between hover:-translate-y-2 transition-all duration-500 hover:shadow-xl group`}>
               <div className="space-y-6 text-left">

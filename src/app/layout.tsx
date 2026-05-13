@@ -18,7 +18,7 @@ const caveat = Caveat({
 export function generateMetadata(): Metadata {
   return {
     title: {
-      default: "Hematyu — Kelola Keuangan Jadi Lebih Mudah",
+      default: "Hematyu",
       template: `%s — Hematyu`,
     },
     description: "Hematyu membantu Anda memonitoring pemasukan dan pengeluaran uang agar bisa lebih hemat dan teratur.",

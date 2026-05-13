@@ -12,20 +12,24 @@ export function Hero() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-3 px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-100 animate-fade-in">
               <span className="flex h-1.5 w-1.5 rounded-xl bg-blue-500 animate-pulse"></span>
-              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em]">Atur Keuangan Lebih Cerdas</p>
+              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em]">Solusi Keuangan Cerdas untuk Semua</p>
             </div>
 
             <h1 className="text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] md:leading-[1.05] text-[#111827]">
               <span className="relative inline-block z-0">
-                Kelola Uangmu,
+                Atur Keuangan,
               </span> <br />
               <span className="text-primary relative inline-block z-0 mt-1 md:mt-2">
-                Wujudkan
+                Jadi Lebih Simpel
               </span> <br />
               <span className="relative inline-block z-0 mt-1 md:mt-2">
-                Mimpi.
+                dan Terukur.
               </span>
             </h1>
+
+            <p className="text-base md:text-lg text-[#6B7280] font-medium max-w-xl leading-relaxed animate-fade-in">
+              Wujudkan kebebasan finansial Anda dengan asisten pintar. Catat transaksi semudah kirim pesan, pantau anggaran otomatis, dan raih target masa depan dengan lebih pasti.
+            </p>
 
             <div className="inline-flex items-center gap-3 p-1 pr-5 bg-white rounded-lg shadow-lg shadow-blue-900/5 border border-gray-50 group hover:scale-105 transition-transform cursor-default">
               <div className="flex -space-x-2.5">
@@ -53,7 +57,7 @@ export function Hero() {
               href="#"
               className="w-full sm:w-auto px-8 py-3.5 bg-white text-[#111827] font-bold text-base rounded-lg border border-gray-200 flex items-center justify-center gap-2 group transition-all hover:bg-gray-50 hover:border-blue-200"
             >
-              Lihat Cara Kerjanya
+              Tanya via WhatsApp
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
