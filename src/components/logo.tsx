@@ -8,8 +8,8 @@ export function Logo({ className }: LogoProps) {
   return (
     <img 
       src="/logo.png" 
-      alt="Hematyu Logo" 
-      className={cn("h-auto w-auto object-contain block rounded-xl", className)}
+      alt="hemat.yu Logo" 
+      className={cn("h-auto w-auto object-contain block", className)}
     />
   );
 }

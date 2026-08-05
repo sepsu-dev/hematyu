@@ -49,11 +49,11 @@ export default function ForgotPasswordPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-1.5 text-left">
-          <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Terdaftar</label>
+          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Terdaftar</label>
           <input 
             type="email" 
             placeholder="nama@email.com"
-            className="w-full px-4 py-2.5 bg-[#FAFAFB] border border-gray-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary/5 focus:border-primary outline-none transition-all"
+            className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
             required
           />
         </div>
@@ -61,14 +61,14 @@ export default function ForgotPasswordPage() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full py-3 bg-[#1E1B4B] text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-indigo-900/10 hover:bg-black transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3.5 bg-slate-900 text-white font-bold text-sm rounded-full border border-slate-900 hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
           ) : (
             <>
               Kirim Tautan
-              <Rocket className="w-3 h-3" />
+              <Rocket className="w-3.5 h-3.5" />
             </>
           )}
         </button>

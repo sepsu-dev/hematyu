@@ -3,30 +3,32 @@ import Link from "next/link";
 
 export function CTA() {
   return (
-    <section className="py-24 px-6 md:px-12 text-center bg-white relative">
-      <div className="max-w-7xl mx-auto p-8 sm:p-16 md:p-24 rounded-3xl bg-gradient-to-br from-[#111827] to-[#111827] space-y-12 relative overflow-hidden shadow-2xl group border border-white/5">
-        <div className="relative z-10 space-y-8">
-          <div className="w-16 h-16 rounded-xl border border-white/20 flex items-center justify-center shadow-2xl mx-auto mb-6">
-            <Heart className="w-8 h-8 text-rose-400 fill-current" />
+    <section className="py-24 px-6 md:px-12 text-center bg-[#FAF6F0] relative overflow-hidden border-t border-stone-900/5">
+      <div className="max-w-4xl mx-auto p-10 md:p-16 sketch-card bg-[#FAF6F0] space-y-8 relative overflow-hidden">
+        
+        <div className="space-y-6">
+          <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center border-1.5 border-stone-900 mx-auto">
+            <Heart className="w-6 h-6 text-[#E35B30] fill-current" />
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tighter">
-            Mulai Perjalanan <br /> Bebas Finansial Anda.
+          <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 leading-tight tracking-tight">
+            Mulai Langkah Finansial <br /> Sehat Anda Hari Ini
           </h2>
-          <p className="text-blue-200/60 text-base md:text-lg font-medium max-w-xl mx-auto leading-relaxed">
-            Bergabung dengan ribuan pengguna lainnya yang telah berhasil mengubah cara mereka mengelola uang.
+          <p className="text-stone-600 text-xs md:text-sm font-semibold max-w-lg mx-auto leading-relaxed">
+            Bergabunglah dengan ribuan pengguna lain yang telah berhasil mengubah cara mereka mengelola uang, mencatat transaksi secara otomatis, dan hidup lebih hemat.
           </p>
         </div>
 
-        <div className="pt-6 relative z-10 flex flex-col items-center gap-6">
+        <div className="pt-4 flex flex-col items-center gap-4">
           <Link
-            href="#"
-            className="inline-flex items-center gap-4 px-12 py-5 bg-white text-[#111827] font-black text-lg rounded-lg hover:scale-105 active:scale-95 transition-all shadow-xl group overflow-hidden relative"
+            href="/register"
+            className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#E35B30] text-white font-extrabold text-sm rounded-full hover:bg-[#DE5024] transition-colors"
           >
-            Daftar Sekarang, Gratis
-            <Rocket className="w-6 h-6 text-primary group-hover:translate-x-1 transition-transform" />
+            <span>Daftar Sekarang, 100% Gratis</span>
+            <Rocket className="w-4 h-4 text-white" />
           </Link>
-          <p className="text-[9px] font-black text-emerald-300/40 uppercase tracking-[0.4em]">Tanpa Kartu Kredit • Batal Kapan Saja</p>
+          <p className="text-[9px] font-bold text-stone-500 uppercase tracking-widest">Registrasi Cepat Tanpa Kartu Kredit</p>
         </div>
+
       </div>
     </section>
   );

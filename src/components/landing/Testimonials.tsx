@@ -1,35 +1,60 @@
 import { Star } from "lucide-react";
-import { Highlighter } from "@/components/highlighter";
 
 export function Testimonials() {
   return (
-    <section className="py-24 px-6 md:px-12 bg-white relative overflow-hidden">
+    <section className="py-24 px-6 md:px-12 bg-[#FAF6F0] relative overflow-hidden border-t border-stone-900/5">
       <div className="max-w-7xl mx-auto space-y-16 relative z-10">
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#111827] tracking-tight">Apa <span className="relative inline-block z-0">Kata Mereka.<Highlighter variant={2} className="text-amber-400/60" strokeWidth={5} /></span></h2>
-          <div className="w-16 h-1 bg-primary rounded-xl mx-auto opacity-10"></div>
+        
+        <div className="text-center space-y-4 max-w-xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.1]">
+            Apa Kata <span className="text-[#E35B30]">Pengguna Kami</span>
+          </h2>
+          <p className="text-stone-600 text-sm md:text-base font-semibold leading-relaxed">
+            Pengalaman nyata dari mereka yang telah berhasil menata finansial pribadi bersama hemat.yu.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:flex-row md:flex gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { name: "Andi Saputra", text: "Fitur AI Roast-nya lucu banget! Jadi malu sendiri kalau mau boros kopi. Tapi beneran ngebantu banget buat nabung.", job: "Karyawan Swasta", color: "bg-[#EFF6FF]" },
-            { name: "Siska Amelia", text: "Scan struk belanjanya juara. Gak perlu capek ngetik lagi, tinggal foto langsung kecatat otomatis.", job: "Freelancer", color: "bg-[#FEF08A]/20" },
-            { name: "Rian Hidayat", text: "Mengatur budget keluarga jadi transparan. Istri juga bisa pantau lewat WhatsApp. Sangat membantu!", job: "Wiraswasta", color: "bg-[#F3F4F6]" }
+            {
+              name: "Andi Saputra",
+              text: "Fitur pencatatan WhatsApp AI-nya sangat mempermudah keseharian saya. Cukup kirim chat nominal belanjaan langsung teratur rapi di dashboard.",
+              job: "Karyawan Swasta",
+              color: "bg-blue-100"
+            },
+            {
+              name: "Siska Amelia",
+              text: "Sebagai freelancer, memisahkan pengeluaran pribadi dan proyek seringkali rumit. Fitur kategori budget hemat.yu memecahkan masalah ini dengan instan.",
+              job: "Freelancer",
+              color: "bg-yellow-100"
+            },
+            {
+              name: "Rian Hidayat",
+              text: "Mengontrol keuangan keluarga jadi lebih transparan dan mudah dipantau bersama istri. Pengingat limit anggarannya sangat membantu mencegah pemborosan.",
+              job: "Wiraswasta",
+              color: "bg-orange-100"
+            }
           ].map((r, i) => (
-            <div key={i} className={`p-6 sm:p-10 rounded-2xl flex-1 ${r.color} shadow-sm border border-white flex flex-col justify-between hover:-translate-y-2 transition-all duration-500 hover:shadow-xl group`}>
-              <div className="space-y-6 text-left">
+            <div key={i} className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
+              <div className="space-y-6">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-3.5 h-3.5 text-amber-400 fill-current" />
+                    <Star key={s} className="w-3.5 h-3.5 text-amber-500 fill-current" />
                   ))}
                 </div>
-                <p className="text-base font-medium text-[#111827] italic leading-relaxed">"{r.text}"</p>
+                <p className="text-xs font-semibold text-stone-700 italic leading-relaxed">
+                  "{r.text}"
+                </p>
               </div>
-              <div className="flex items-center gap-4 mt-10">
-                <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${r.name}`} className="w-10 h-10 rounded-lg border-2 border-white shadow-xl group-hover:scale-110 transition-transform" alt="avatar" />
-                <div className="text-left">
-                  <h3 className="font-bold text-xs text-[#111827]">{r.name}</h3>
-                  <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{r.job}</p>
+              <div className="flex items-center gap-4 mt-8 pt-4 border-t border-stone-900/5">
+                <img
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${r.name}`}
+                  className={`w-9 h-9 rounded-xl border border-stone-900/10 ${r.color}`}
+                  alt={r.name}
+                />
+                <div>
+                  <h3 className="font-extrabold text-xs text-stone-900">{r.name}</h3>
+                  <p className="text-[9px] font-extrabold text-[#E35B30] uppercase tracking-wider">{r.job}</p>
                 </div>
               </div>
             </div>

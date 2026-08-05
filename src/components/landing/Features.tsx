@@ -1,140 +1,148 @@
-import { Receipt, Banknote, Calendar, Target, BellRing, ShieldCheck, Lock, Check, MessageSquare, Camera, MousePointer2, Zap, Heart, ArrowRight, TrendingUp } from "lucide-react";
-import { Highlighter } from "@/components/highlighter";
+"use client";
+
+import Link from "next/link";
+import { Star, ShieldAlert, Heart, Calendar, Compass, AppWindow } from "lucide-react";
+
+// ─── Cartoon Leaning Character SVG (Top-Right Features) ──────────────────────────────
+const LeaningCharacterIllustration = () => (
+  <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full max-w-[140px] md:max-w-[170px] drop-shadow-sm">
+    {/* Hair Back */}
+    <path d="M70 45 C55 15 145 15 130 45 Z" fill="#E35B30" stroke="#1C1917" strokeWidth="2" />
+    
+    {/* Head */}
+    <rect x="80" y="35" width="40" height="40" rx="12" fill="#FAF6F0" stroke="#1C1917" strokeWidth="2" />
+    <circle cx="92" cy="52" r="2.5" fill="#1C1917" />
+    <circle cx="108" cy="52" r="2.5" fill="#1C1917" />
+    <path d="M96 62 Q100 66 104 62" stroke="#1C1917" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+    
+    {/* Hair Front/Bangs */}
+    <path d="M78 38 C85 30 115 30 122 38 C115 42 85 42 78 38 Z" fill="#E35B30" stroke="#1C1917" strokeWidth="2" />
+
+    {/* Torso/Blue Shirt */}
+    <path d="M65 75 C65 75 70 120 100 120 C130 120 135 75 135 75 Z" fill="#1D4ED8" stroke="#1C1917" strokeWidth="2" />
+
+    {/* Arms leaning forward */}
+    <path d="M50 115 C55 105 145 105 150 115" fill="none" stroke="#1C1917" strokeWidth="3.5" strokeLinecap="round" />
+    <path d="M50 110 L150 110" stroke="#1C1917" strokeWidth="2" />
+  </svg>
+);
 
 export function Features() {
   return (
-    <section id="fitur" className="px-6 md:px-12 py-24 bg-white relative">
+    <section id="fitur" className="px-6 md:px-12 py-24 bg-[#FAF6F0] relative overflow-hidden">
       <div className="max-w-7xl mx-auto space-y-16 relative z-10">
-        <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight">Solusi Lengkap untuk <br /> <span className="relative inline-block z-0">Kesehatan Finansial Anda.<Highlighter variant={2} className="text-emerald-300/80" strokeWidth={4} /></span></h2>
-          <p className="text-sm md:text-base text-[#6B7280] font-medium leading-relaxed">Dari pencatatan harian hingga perencanaan masa depan, semua dikelola secara otomatis dan cerdas.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Feature 1 - Multi-Input */}
-          <div className="md:col-span-8 p-8 sm:p-12 bg-gradient-to-br from-[#EFF6FF] to-white rounded-3xl space-y-12 group overflow-hidden relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] hover:border-blue-100 transition-all duration-700">
-            <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 transition-transform duration-1000">
-              <MessageSquare className="w-64 h-64 text-blue-600" />
-            </div>
-            <div className="relative z-10 space-y-8">
-              <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-gray-100 group-hover:rotate-6 transition-transform shadow-sm">
-                <MessageSquare className="w-7 h-7 text-primary" />
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-3xl md:text-4xl font-bold text-[#111827] tracking-tight">Pencatatan Tanpa Repot</h3>
-                <p className="text-[#6B7280] text-base md:text-lg font-medium max-w-xl leading-relaxed">
-                  Pilih metode yang paling nyaman bagi Anda. Semua transaksi akan tercatat otomatis dengan bantuan asisten AI.
-                </p>
-              </div>
-
-              <div className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {[
-                  { label: 'WhatsApp', icon: MessageSquare, desc: 'Chat "Makan 50rb"', color: 'bg-blue-50' },
-                  { label: 'Scan Struk', icon: Camera, desc: 'Foto struk belanja', color: 'bg-emerald-50' },
-                  { label: 'Manual', icon: MousePointer2, desc: 'Input presisi & cepat', color: 'bg-amber-50' },
-                ].map((item, i) => (
-                  <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3 hover:-translate-y-2 transition-all duration-500 hover:shadow-md">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg ${item.color} flex items-center justify-center`}>
-                        <item.icon className="w-4 h-4 text-[#111827]" />
-                      </div>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{item.label}</p>
-                    </div>
-                    <p className="text-xs font-bold text-[#111827]">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+        
+        {/* ─── Top Heading & Illustration row ─── */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-8 pb-4">
+          <div className="text-left space-y-4 max-w-lg">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.1]">
+              Semua yang Anda <br />
+              butuhkan, tetap <br />
+              <span className="text-[#E35B30]">100% gratis</span>
+            </h2>
+            <p className="text-sm md:text-base text-stone-600 font-semibold leading-relaxed">
+              Kami menyajikan kemudahan pencatatan finansial tanpa biaya tersembunyi.
+            </p>
           </div>
-
-          {/* Feature 2 - Category Budgeting */}
-          <div className="md:col-span-4 p-8 bg-[#FFFBEB] rounded-3xl space-y-8 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-amber-100/50 relative overflow-hidden group hover:shadow-[0_20px_50px_rgba(251,191,36,0.1)] transition-all duration-700">
-            <div className="absolute -top-10 -right-10 w-48 h-48 text-amber-700/10 rotate-45 group-hover:rotate-[60deg] transition-transform duration-1000">
-              <Calendar className="w-full h-full fill-current" />
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-amber-100 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-              <Banknote className="w-6 h-6 text-amber-600" />
-            </div>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold text-[#854D0E] tracking-tight">Anggaran Per Kategori</h3>
-                <p className="text-[#854D0E]/80 font-medium text-sm leading-relaxed">
-                  Atur batas pengeluaran spesifik untuk makan, transportasi, atau hiburan.
-                </p>
-              </div>
-              <div className="p-5 bg-white rounded-2xl space-y-4 border border-amber-100/50 shadow-sm">
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[10px] font-bold text-amber-900 uppercase tracking-widest">
-                    <span>Makan & Minum</span>
-                    <span>65%</span>
-                  </div>
-                  <div className="h-2 w-full bg-amber-50 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 w-[65%] rounded-full shadow-[0_0_8px_rgba(245,158,11,0.3)]"></div>
-                  </div>
-                </div>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[10px] font-bold text-amber-900 uppercase tracking-widest">
-                    <span>Transportasi</span>
-                    <span>40%</span>
-                  </div>
-                  <div className="h-2 w-full bg-amber-50 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-400 w-[40%] rounded-full shadow-[0_0_8px_rgba(251,191,36,0.2)]"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 3 - Asisten Finansial Personal */}
-          <div className="md:col-span-4 p-8 bg-white rounded-3xl space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden group hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-700">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center border border-amber-100 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-              <Zap className="w-6 h-6 text-amber-500" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-[#111827] tracking-tight">Asisten Keuangan Personal</h3>
-              <p className="text-[#6B7280] font-medium text-sm leading-relaxed">
-                Terima tips cerdas dan pengingat harian yang disesuaikan agar kondisi keuangan Anda tetap sehat.
-              </p>
-            </div>
-            <div className="pt-2 flex items-center gap-2 text-[10px] font-bold text-amber-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-              Pelajari Lebih Lanjut <ArrowRight className="w-3 h-3" />
-            </div>
-          </div>
-
-          {/* Feature 5 - Tantangan Menabung */}
-          <div className="md:col-span-4 p-8 bg-[#F0FDF4] rounded-3xl space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-emerald-100/50 relative overflow-hidden group hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] transition-all duration-700">
-            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-emerald-100 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
-              <Target className="w-6 h-6 text-emerald-600" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-[#065F46] tracking-tight">Tantangan Menabung</h3>
-              <p className="text-[#065F46]/80 font-medium text-sm leading-relaxed">
-                Ikuti rencana terukur untuk dana darurat atau impian finansial Anda lainnya.
-              </p>
-            </div>
-            <div className="pt-2 flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-              Mulai Menabung <ArrowRight className="w-3 h-3" />
-            </div>
-          </div>
-
-          {/* Feature 8 - Analytics */}
-          <div className="md:col-span-4 p-8 bg-blue-600 text-white rounded-3xl space-y-6 shadow-xl relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
-            <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:scale-125 transition-transform duration-700">
-              <TrendingUp className="w-32 h-32 text-white" />
-            </div>
-            <div className="relative z-10 space-y-6">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold tracking-tight">Laporan Visual AI</h3>
-                <p className="text-blue-100 font-medium text-sm leading-relaxed">
-                  Visualisasi data yang cerdas membantu Anda memahami arus kas dalam satu kedipan mata.
-                </p>
-              </div>
-            </div>
+          <div className="hidden md:block shrink-0">
+            <LeaningCharacterIllustration />
           </div>
         </div>
+
+        {/* ─── Main 3-Column Card Box ─── */}
+        <div className="sketch-card-flat bg-transparent p-8 md:p-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+          
+          {/* Column 1 */}
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center border-1.5 border-stone-900">
+              <Compass className="w-5 h-5 text-[#E35B30]" />
+            </div>
+            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Info Terpercaya</h3>
+            <p className="text-xs text-stone-600 font-semibold leading-relaxed max-w-[240px]">
+              Alokasi limit ideal & tip berhemat tervalid langsung untuk Anda.
+            </p>
+          </div>
+
+          {/* Column 2 */}
+          <div className="flex flex-col items-center text-center space-y-4 border-y md:border-y-0 md:border-x border-stone-900/10 py-8 md:py-0">
+            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center border-1.5 border-stone-900">
+              <Heart className="w-5 h-5 text-blue-600" />
+            </div>
+            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Alat Pendukung</h3>
+            <p className="text-xs text-stone-600 font-semibold leading-relaxed max-w-[240px]">
+              Chat bot WA otomatis, scan OCR struk instan, & grafik arus kas harian.
+            </p>
+          </div>
+
+          {/* Column 3 */}
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center border-1.5 border-stone-900">
+              <Star className="w-5 h-5 text-amber-500 fill-current" />
+            </div>
+            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Saran Personal</h3>
+            <p className="text-xs text-stone-600 font-semibold leading-relaxed max-w-[240px]">
+              Deteksi jajan berlebih & tip hemat berdasarkan histori transaksi.
+            </p>
+          </div>
+
+        </div>
+
+        {/* ─── Bottom Layout: Feature Showcase Cards ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Card A */}
+          <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
+            <div className="space-y-4">
+              <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#E35B30]">Tabungan</span>
+              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">Tantangan Nabung Rutin</h4>
+              <p className="text-xs text-stone-600 font-semibold leading-relaxed">
+                Tetapkan goals & tantangan menabung mingguan secara terarah dengan grafik pencapaian yang presisi.
+              </p>
+            </div>
+            <div className="pt-6">
+              <Link href="#kalkulator" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
+                Pelajari Selengkapnya 
+                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Card B */}
+          <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
+            <div className="space-y-4">
+              <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#E35B30]">Asisten AI</span>
+              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">Review & Roast AI</h4>
+              <p className="text-xs text-stone-600 font-semibold leading-relaxed">
+                Asisten AI akan menilai gaya hidup Anda dengan nada santai & lucu agar terpikir dua kali sebelum boros.
+              </p>
+            </div>
+            <div className="pt-6">
+              <Link href="#demo" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
+                Pelajari Selengkapnya 
+                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Card C */}
+          <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
+            <div className="space-y-4">
+              <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#E35B30]">Integrasi</span>
+              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">WhatsApp Logger</h4>
+              <p className="text-xs text-stone-600 font-semibold leading-relaxed">
+                Cukup ketik nominal & keterangan transaksi lewat chat WhatsApp, AI kami akan memilah kategori secara otomatis.
+              </p>
+            </div>
+            <div className="pt-6">
+              <Link href="#fitur" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
+                Pelajari Selengkapnya 
+                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              </Link>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
   );

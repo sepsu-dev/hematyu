@@ -19,29 +19,29 @@ export default function PrivacyPage() {
   ];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-transparent">
       <div className="max-w-3xl mx-auto px-6 py-24 space-y-12">
-        <div className="space-y-4 border-b border-gray-100 pb-12">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-[#1E1B4B] tracking-tight">Kebijakan Privasi</h1>
-          <p className="text-sm font-medium text-gray-400 uppercase tracking-widest">Terakhir diperbarui: 11 Mei 2026</p>
+        <div className="space-y-4 border-b-2 border-slate-900/10 pb-12">
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Kebijakan Privasi</h1>
+          <p className="text-sm font-black text-slate-500 uppercase tracking-widest">Terakhir diperbarui: 11 Mei 2026</p>
         </div>
 
         <div className="space-y-10">
           {policies.map((policy, i) => (
-            <div key={i} className="space-y-4">
-              <h2 className="text-xl font-bold text-[#1E1B4B]">{policy.title}</h2>
-              <p className="text-[#6B7280] font-medium leading-relaxed">
+            <div key={i} className="space-y-4 text-left">
+              <h2 className="text-xl font-black text-slate-900">{policy.title}</h2>
+              <p className="text-slate-700 font-bold leading-relaxed">
                 {policy.desc}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="pt-12 border-t border-gray-100">
-          <div className="p-8 bg-[#F8FAFF] rounded-3xl border border-indigo-50 space-y-4">
-            <h3 className="font-bold text-[#1E1B4B]">Keamanan Adalah Prioritas Kami</h3>
-            <p className="text-sm text-[#6B7280] font-medium leading-relaxed">
-              Jika Anda memiliki kekhawatiran tentang privasi data Anda, tim keamanan kami tersedia di <span className="font-bold text-primary">privacy@hematyu.com</span>.
+        <div className="pt-12 border-t-2 border-slate-900/10">
+          <div className="p-8 bg-white brutal-card space-y-4 text-left">
+            <h3 className="font-black text-slate-900">Keamanan Adalah Prioritas Kami</h3>
+            <p className="text-sm text-slate-700 font-bold leading-relaxed">
+              Jika Anda memiliki kekhawatiran tentang privasi data Anda, tim keamanan kami tersedia di <span className="font-black text-purple-600">privacy@hemat.yu</span>.
             </p>
           </div>
         </div>

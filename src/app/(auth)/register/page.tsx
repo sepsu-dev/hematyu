@@ -16,12 +16,12 @@ export default function RegisterPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-xl font-bold text-[#1E1B4B]">Buat Akun</h1>
-        <p className="text-xs text-[#6B7280]">Daftar gratis untuk mulai mengelola aset</p>
+        <h1 className="text-xl font-black text-slate-900">Buat Akun</h1>
+        <p className="text-xs font-bold text-slate-700">Daftar gratis untuk mulai mengelola aset</p>
       </div>
 
       <div className="flex flex-col gap-3">
-        <button className="flex items-center justify-center gap-3 py-3 border border-gray-100 rounded-xl hover:bg-gray-50 transition-all font-bold text-xs text-[#1E1B4B] shadow-sm w-full">
+        <button className="flex items-center justify-center gap-3 py-3 border border-slate-900 rounded-full hover:bg-slate-50 transition-all font-bold text-sm text-slate-900 w-full bg-white">
           <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" />
           Daftar dengan Google
         </button>
@@ -29,39 +29,39 @@ export default function RegisterPage() {
 
       <div className="relative flex items-center justify-center">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-50"></div>
+          <div className="w-full border-t border-slate-900/10"></div>
         </div>
-        <span className="relative px-3 bg-white text-[9px] font-black text-gray-300 uppercase tracking-widest">Atau</span>
+        <span className="relative px-3 bg-white text-[9px] font-black text-slate-500 uppercase tracking-widest">Or</span>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama</label>
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Nama</label>
             <input 
               type="text" 
               placeholder="Budi Santoso"
-              className="w-full px-4 py-2.5 bg-[#FAFAFB] border border-gray-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary/5 focus:border-primary outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Email</label>
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Email</label>
             <input 
               type="email" 
               placeholder="nama@email.com"
-              className="w-full px-4 py-2.5 bg-[#FAFAFB] border border-gray-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary/5 focus:border-primary outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Sandi</label>
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Sandi</label>
             <input 
               type="password" 
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 bg-[#FAFAFB] border border-gray-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary/5 focus:border-primary outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
               required
             />
           </div>
@@ -70,22 +70,22 @@ export default function RegisterPage() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full py-3 bg-primary text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3.5 bg-slate-900 text-white font-bold text-sm rounded-full border border-slate-900 hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
           ) : (
             <>
               Daftar
-              <Rocket className="w-3 h-3" />
+              <Rocket className="w-3.5 h-3.5" />
             </>
           )}
         </button>
       </form>
 
-      <p className="text-center text-xs font-medium text-[#6B7280]">
+      <p className="text-center text-xs font-bold text-slate-600">
         Sudah punya akun? {" "}
-        <Link href="/login" className="font-black text-primary hover:underline underline-offset-4">Masuk</Link>
+        <Link href="/login" className="font-black text-purple-600 hover:underline underline-offset-4">Masuk</Link>
       </p>
     </div>
   );
