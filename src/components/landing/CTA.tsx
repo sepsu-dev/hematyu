@@ -21,7 +21,7 @@ export function CTA() {
         <div className="pt-4 flex flex-col items-center gap-4">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#E35B30] text-white font-extrabold text-sm rounded-full hover:bg-[#DE5024] transition-colors"
+            className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#E35B30] text-white font-extrabold text-sm rounded-lg hover:bg-[#DE5024] transition-colors"
           >
             <span>Daftar Sekarang, 100% Gratis</span>
             <Rocket className="w-4 h-4 text-white" />

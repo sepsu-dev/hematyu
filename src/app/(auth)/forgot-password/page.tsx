@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
           <input 
             type="email" 
             placeholder="nama@email.com"
-            className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+            className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
             required
           />
         </div>
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full py-3.5 bg-slate-900 text-white font-bold text-sm rounded-full border border-slate-900 hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3.5 bg-slate-900 text-white font-bold text-sm rounded-lg border border-transparent hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>

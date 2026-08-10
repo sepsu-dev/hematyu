@@ -69,7 +69,7 @@ export function Hero() {
 
         {/* ─── Left Column: Title & Action ─── */}
         <div className="lg:col-span-5 text-left space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E35B30]/10 text-[#E35B30] text-[10px] font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#E35B30]/10 text-[#E35B30] text-[10px] font-bold uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5 fill-current" />
             <span>Asisten Keuangan WhatsApp AI</span>
           </div>
@@ -93,7 +93,7 @@ export function Hero() {
           <div className="flex flex-row items-center gap-4 pt-2">
             <Link
               href="/register"
-              className="px-7 py-3.5 bg-[#2563EB] text-white font-extrabold text-sm rounded-full hover:bg-[#1D4ED8] transition-all shadow-sm active:translate-y-0.5"
+              className="px-7 py-3.5 bg-[#2563EB] text-white font-extrabold text-sm rounded-lg hover:bg-[#1D4ED8] transition-all shadow-sm active:translate-y-0.5"
             >
               Daftar Sekarang
             </Link>

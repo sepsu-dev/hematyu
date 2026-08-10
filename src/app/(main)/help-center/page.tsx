@@ -23,7 +23,7 @@ export default function HelpCenterPage() {
             <input 
               type="text" 
               placeholder="Cari bantuan (misal: cara ganti email)"
-              className="w-full pl-12 pr-4 py-4 bg-white border border-slate-900 rounded-full focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-sm font-bold text-slate-900"
+              className="w-full pl-12 pr-4 py-4 bg-white border border-border rounded-lg focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-sm font-bold text-slate-900"
             />
           </div>
         </div>
@@ -31,16 +31,16 @@ export default function HelpCenterPage() {
         {/* Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((cat, i) => (
-            <Link key={i} href="#" className="p-8 bg-white brutal-card hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#111827] transition-all group">
+            <Link key={i} href="#" className="p-8 bg-white brutal-card group">
               <div className="space-y-6">
-                <div className={`w-12 h-12 rounded-xl ${cat.color} flex items-center justify-center border-2 border-slate-900 text-slate-900 shadow-[2px_2px_0px_#111827] group-hover:scale-105 transition-transform`}>
+                <div className={`w-12 h-12 rounded-xl ${cat.color} flex items-center justify-center border border-border text-slate-900 shadow-sm group-hover:scale-105 transition-transform`}>
                   <cat.icon className="w-6 h-6" />
                 </div>
                 <div className="space-y-2 text-left">
                   <h3 className="text-xl font-black text-slate-900">{cat.title}</h3>
                   <p className="text-sm text-slate-700 leading-relaxed font-bold">{cat.desc}</p>
                 </div>
-                <div className="pt-4 border-t-2 border-slate-900/10 flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                <div className="pt-4 border-t border-border flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   <span>{cat.count} Artikel</span>
                   <span className="text-purple-600 group-hover:translate-x-1 transition-transform">Lihat →</span>
                 </div>
@@ -57,8 +57,8 @@ export default function HelpCenterPage() {
               Tim dukungan kami tersedia 24/7 untuk membantu Anda menyelesaikan kendala teknis maupun administratif.
             </p>
             <div className="pt-4 flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/contact" className="px-8 py-3.5 bg-primary text-white font-bold text-sm rounded-full border border-primary hover:bg-primary/95 transition-colors">Hubungi Dukungan</Link>
-              <Link href="#" className="px-8 py-3.5 bg-white text-slate-900 font-bold text-sm rounded-full border border-slate-900 hover:bg-slate-50 transition-colors">Kirim Tiket</Link>
+              <Link href="mailto:halo@hemat.yu" className="px-8 py-3.5 bg-primary text-white font-bold text-sm rounded-lg border border-primary hover:bg-primary/95 transition-colors">Hubungi Dukungan</Link>
+              <Link href="#" className="px-8 py-3.5 bg-white text-slate-900 font-bold text-sm rounded-lg border border-border hover:bg-slate-50 transition-colors">Kirim Tiket</Link>
             </div>
           </div>
         </div>

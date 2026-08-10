@@ -74,7 +74,7 @@
   --input: #E7DED4;
   --ring: #2563EB;
 
-  --radius: 1.25rem;
+  --radius: 0.6rem;
 }
 
 .dark {
@@ -127,22 +127,24 @@
     animation: bounce-slow 4s ease-in-out infinite;
   }
 
-  .sketch-card {
-    background: #FAF6F0;
-    border: 1.5px solid #1C1917;
-    box-shadow: 4px 4px 0px #1C1917;
-    border-radius: 1.5rem;
-    transition: all 0.2s ease-in-out;
+  .sketch-card,
+  .brutal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(28, 25, 23, 0.04), 0 1px 4px rgba(28, 25, 23, 0.02);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .sketch-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #1C1917;
+  .sketch-card:hover,
+  .brutal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(28, 25, 23, 0.06), 0 3px 8px rgba(28, 25, 23, 0.03);
   }
 
   .sketch-card-flat {
-    border: 1.5px solid #1C1917;
-    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     background: transparent;
   }
 }

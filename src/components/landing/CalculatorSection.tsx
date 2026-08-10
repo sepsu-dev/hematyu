@@ -127,14 +127,14 @@ export function CalculatorSection() {
           <div className="pt-2">
             <button
               onClick={handleCalculate}
-              className="px-8 py-3.5 bg-[#2563EB] text-white font-extrabold text-xs rounded-full hover:bg-[#1D4ED8] transition-colors cursor-pointer"
+              className="px-8 py-3.5 bg-[#2563EB] text-white font-extrabold text-xs rounded-lg hover:bg-[#1D4ED8] transition-colors cursor-pointer"
             >
               Hitung Simulasi
             </button>
           </div>
 
           {result && (
-            <div className="mt-4 p-5 bg-[#FAF6F0] border-1.5 border-stone-900 rounded-2xl max-w-lg animate-fade-in shadow-[4px_4px_0px_#1C1917]">
+            <div className="mt-4 p-5 bg-[#FAF6F0] border border-[#E7DED4] rounded-2xl max-w-lg animate-fade-in shadow-sm">
               <p className="text-xs md:text-sm font-extrabold text-stone-950">{result}</p>
             </div>
           )}

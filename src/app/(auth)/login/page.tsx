@@ -21,7 +21,7 @@ export default function LoginPage() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <button className="flex items-center justify-center gap-3 py-3 border border-slate-900 rounded-full hover:bg-slate-50 transition-all font-bold text-sm text-slate-900 w-full bg-white">
+        <button className="flex items-center justify-center gap-3 py-3 border border-border rounded-lg hover:bg-slate-50 transition-all font-bold text-sm text-slate-900 w-full bg-white">
           <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-4 h-4" alt="Google" />
           Lanjutkan dengan Google
         </button>
@@ -41,7 +41,7 @@ export default function LoginPage() {
             <input 
               type="email" 
               placeholder="nama@email.com"
-              className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
               required
             />
           </div>
@@ -54,7 +54,7 @@ export default function LoginPage() {
             <input 
               type="password" 
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 bg-white border border-slate-900 rounded-full text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-xs font-bold text-slate-900 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
               required
             />
           </div>
@@ -63,7 +63,7 @@ export default function LoginPage() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full py-3.5 bg-slate-900 text-white font-bold text-sm rounded-full border border-slate-900 hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3.5 bg-slate-900 text-white font-bold text-sm rounded-lg border border-transparent hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
