@@ -45,7 +45,7 @@ export function NotificationsDropdown({ isOpen, onToggle }: NotificationsDropdow
         <div className="absolute right-0 mt-2 w-80 bg-white border border-stone-200 rounded-lg shadow-lg py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
           {/* Header */}
           <div className="px-4 py-2 border-b border-stone-100 flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-900">
+            <span className="text-xs font-bold tracking-wider text-stone-900">
               Notifikasi
             </span>
             <span className="text-[10px] font-bold text-primary cursor-pointer hover:underline">

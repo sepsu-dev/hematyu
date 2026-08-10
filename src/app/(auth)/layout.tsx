@@ -27,10 +27,6 @@ export default function AuthLayout({
         <div className="bg-white p-8 brutal-card">
           {children}
         </div>
-
-        <p className="text-center text-[10px] font-black text-slate-900/60 uppercase tracking-widest">
-          © {new Date().getFullYear()} hemat.yu • Keamanan Terjamin
-        </p>
       </div>
     </div>
   );
