@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Zap, CreditCard, Box, Shield } from "lucide-react";
+import { Highlighter } from "@/components/highlighter";
 
 // ─── Cartoon Desk Illustration (Center Hero SVG) ──────────────────────────────
 const HeroDeskIllustration = () => (
@@ -77,12 +78,13 @@ export function Hero() {
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-stone-900">
             Kelola semua <br />
             uang dengan <br />
-            <span className="relative inline-block text-[#E35B30]">
+            <span className="relative inline-block text-stone-900 z-10 px-2 py-0.5">
               langkah tepat
-              {/* Hand-drawn circular sketch outline under 'langkah tepat' */}
-              <svg className="absolute -bottom-2 left-0 w-full h-4" viewBox="0 0 200 20" fill="none">
-                <path d="M5 12 C60 2 140 2 195 8 C140 18 60 16 10 14" stroke="#E35B30" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
+              <Highlighter
+                variant={9}
+                className="text-[#FDE047]/70 -bottom-0.5 -left-1 w-[105%] h-[100%] rounded-lg"
+                animated
+              />
             </span>
           </h1>
 

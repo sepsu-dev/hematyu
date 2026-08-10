@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Highlighter } from "@/components/highlighter";
 
 // ─── Cartoon Cards SVG ──────────────────────────────
 const CardsIllustration = () => (
@@ -70,7 +71,7 @@ export function CalculatorSection() {
   return (
     <section id="kalkulator" className="py-24 px-6 md:px-12 bg-[#FAF6F0] relative overflow-hidden border-t border-stone-900/5">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-        
+
         {/* ─── Left Column: Custom SVG Illustration ─── */}
         <div className="lg:col-span-5 flex justify-center items-center">
           <CardsIllustration />
@@ -81,12 +82,13 @@ export function CalculatorSection() {
           <h2 className="text-3xl md:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.15]">
             Lihat limit anggaran & <br />
             opsi paling {" "}
-            <span className="relative inline-block text-[#E35B30]">
+            <span className="relative inline-block text-stone-900 z-10 px-4 py-1.5 mx-1">
               hemat di sini
-              {/* Hand drawn loop circle */}
-              <svg className="absolute -bottom-1 -left-1 w-[105%] h-5 text-[#E35B30]" viewBox="0 0 160 20" fill="none">
-                <path d="M3 10 C50 -2 120 -2 157 8 C110 18 40 18 5 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
+              <Highlighter
+                variant={9}
+                className="text-[#FDE047] -bottom-0.5 left-0 w-full h-full rounded-xl"
+                animated
+              />
             </span>
           </h2>
 

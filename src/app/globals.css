@@ -172,3 +172,9 @@
     transform: translateY(-10px) scale(1.02);
   }
 }
+
+@keyframes drawStroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
