@@ -7,8 +7,11 @@ import {
     createTransaction,
     deleteTransaction,
     getTransactions,
+    getTransactionsCount,
+    getRecentTransactions,
     getSummary,
     getExpenseByCategory,
+    getIncomeByCategory,
     getMonthlySummary,
     getWeeklySummary,
 } from "@/lib/services/transactions";
@@ -41,9 +44,23 @@ async function requireUser() {
     return session;
 }
 
-export async function getTransactionsAction() {
+export async function getTransactionsAction(params?: {
+    limit?: number;
+    offset?: number;
+    type?: "INCOME" | "EXPENSE";
+}) {
     const session = await requireUser();
-    return await getTransactions(session.userId);
+    return await getTransactions(session.userId, params);
+}
+
+export async function getTransactionsCountAction(type?: "INCOME" | "EXPENSE") {
+    const session = await requireUser();
+    return await getTransactionsCount(session.userId, type);
+}
+
+export async function getRecentTransactionsAction(limit = 5) {
+    const session = await requireUser();
+    return await getRecentTransactions(session.userId, limit);
 }
 
 export async function getCategoriesAction() {
@@ -59,6 +76,11 @@ export async function getSummaryAction() {
 export async function getExpenseBreakdownAction() {
     const session = await requireUser();
     return await getExpenseByCategory(session.userId);
+}
+
+export async function getIncomeBreakdownAction() {
+    const session = await requireUser();
+    return await getIncomeByCategory(session.userId);
 }
 
 export async function getMonthlySummaryAction() {

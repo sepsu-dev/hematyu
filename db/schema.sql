@@ -83,6 +83,15 @@ CREATE INDEX idx_transactions_user_type ON transactions(user_id, type);
 CREATE INDEX idx_transactions_category ON transactions(category_id);
 CREATE INDEX idx_transactions_account ON transactions(account_id);
 
+-- Composite index untuk query transaksi dengan filter type + pagination (ORDER BY date DESC)
+CREATE INDEX idx_transactions_user_type_date ON transactions(user_id, type, date DESC);
+
+-- Composite index untuk query budget spent (subquery per kategori per bulan)
+CREATE INDEX idx_transactions_user_cat_type_date ON transactions(user_id, category_id, type, date);
+
+-- Composite index untuk query accounts (LEFT JOIN + SUM per account)
+CREATE INDEX idx_transactions_account_type ON transactions(account_id, type);
+
 -- ─── Budgets (Coming Soon) ───────────────────────────────────────
 CREATE TABLE budgets (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -96,6 +105,7 @@ CREATE TABLE budgets (
 );
 
 CREATE INDEX idx_budgets_user ON budgets(user_id);
+CREATE INDEX idx_budgets_user_period ON budgets(user_id, period);
 
 -- ─── Goals (Coming Soon) ─────────────────────────────────────────
 CREATE TABLE goals (

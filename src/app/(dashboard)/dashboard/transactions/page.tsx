@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -13,6 +13,8 @@ import {
   PlusCircle,
   Tag,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   Select,
@@ -23,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import {
   getTransactionsAction,
+  getTransactionsCountAction,
+  getSummaryAction,
   getCategoriesAction,
   getAccountsAction,
   createTransactionAction,
@@ -57,7 +61,15 @@ interface Category {
   is_default: boolean;
 }
 
+interface Summary {
+  totalIncome: number;
+  totalExpense: number;
+  balance: number;
+  totalCount: number;
+}
+
 const QUICK_AMOUNTS = [10000, 50000, 100000, 500000];
+const PAGE_SIZE = 10;
 
 function formatRp(n: number) {
   return "Rp " + n.toLocaleString("id-ID");
@@ -67,12 +79,37 @@ function formatDate(d: string | Date) {
   return new Date(d).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+function SkeletonRow() {
+  return (
+    <tr className="animate-pulse">
+      <td className="p-4"><div className="h-3 w-20 bg-stone-100 rounded" /></td>
+      <td className="p-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-stone-100" />
+          <div className="h-3 w-32 bg-stone-100 rounded" />
+        </div>
+      </td>
+      <td className="p-4"><div className="h-5 w-24 bg-stone-100 rounded-lg" /></td>
+      <td className="p-4"><div className="h-5 w-16 bg-stone-100 rounded-lg" /></td>
+      <td className="p-4"><div className="h-3 w-20 bg-stone-100 rounded" /></td>
+      <td className="p-4"><div className="h-3 w-24 bg-stone-100 rounded ml-auto" /></td>
+      <td className="p-4"><div className="h-3 w-3 bg-stone-100 rounded" /></td>
+    </tr>
+  );
+}
+
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
   const [filter, setFilter] = useState<"all" | TxType>("all");
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [incomeCount, setIncomeCount] = useState(0);
+  const [expenseCount, setExpenseCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingPage, setLoadingPage] = useState(false);
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -86,24 +123,64 @@ export default function TransactionsPage() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    Promise.all([getTransactionsAction(), getCategoriesAction(), getAccountsAction()])
-      .then(([txData, catData, accData]) => {
-        setTransactions(txData);
-        setCategories(catData);
-        setAccounts(accData);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  const loadTransactions = useCallback(async (pageNum: number, type: "all" | TxType) => {
+    setLoadingPage(true);
+    try {
+      const offset = (pageNum - 1) * PAGE_SIZE;
+      const [txData, count, incCount, expCount] = await Promise.all([
+        getTransactionsAction({
+          limit: PAGE_SIZE,
+          offset,
+          type: type === "all" ? undefined : type,
+        }),
+        getTransactionsCountAction(type === "all" ? undefined : type),
+        getTransactionsCountAction("INCOME"),
+        getTransactionsCountAction("EXPENSE"),
+      ]);
+      setTransactions(txData);
+      setTotalCount(count);
+      setIncomeCount(incCount);
+      setExpenseCount(expCount);
+    } catch {
+      setTransactions([]);
+      setTotalCount(0);
+      setIncomeCount(0);
+      setExpenseCount(0);
+    } finally {
+      setLoadingPage(false);
+      setLoading(false);
+    }
   }, []);
 
-  const totalIncome = transactions
-    .filter((t) => t.type === "INCOME")
-    .reduce((s, t) => s + t.amount, 0);
-  const totalExpense = transactions
-    .filter((t) => t.type === "EXPENSE")
-    .reduce((s, t) => s + t.amount, 0);
-  const filtered = filter === "all" ? transactions : transactions.filter((t) => t.type === filter);
+  useEffect(() => {
+    Promise.all([
+      getSummaryAction(),
+      getCategoriesAction(),
+      getAccountsAction(),
+    ])
+      .then(([sumData, catData, accData]) => {
+        setSummary(sumData);
+        setCategories(catData);
+        setAccounts(accData);
+      })
+      .catch(() => { });
+    loadTransactions(1, "all");
+  }, [loadTransactions]);
+
+  const handleFilterChange = (f: "all" | TxType) => {
+    setFilter(f);
+    setPage(1);
+    loadTransactions(1, f);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages || newPage === page) return;
+    setPage(newPage);
+    loadTransactions(newPage, filter);
+  };
+
   const numericAmount = parseInt(amount || "0", 10);
 
   const openModal = (tab: TxType) => {
@@ -146,8 +223,11 @@ export default function TransactionsPage() {
         note: note.trim(),
         accountId: accountId || undefined,
       });
-      const txData = await getTransactionsAction();
-      setTransactions(txData);
+      const [sumData] = await Promise.all([
+        getSummaryAction(),
+        loadTransactions(page, filter),
+      ]);
+      setSummary(sumData);
       closeModal();
     } catch {
       setError("Gagal menyimpan transaksi.");
@@ -161,13 +241,19 @@ export default function TransactionsPage() {
     setDeletingId(id);
     try {
       await deleteTransactionAction(id);
-      setTransactions((prev) => prev.filter((t) => t.id !== id));
+      const [sumData] = await Promise.all([
+        getSummaryAction(),
+        loadTransactions(page, filter),
+      ]);
+      setSummary(sumData);
     } finally {
       setDeletingId(null);
     }
   };
 
   const categoriesForTab = categories.filter((c) => c.type === modalTab);
+  const startIdx = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const endIdx = Math.min(page * PAGE_SIZE, totalCount);
 
   return (
     <div className="space-y-6">
@@ -203,7 +289,11 @@ export default function TransactionsPage() {
           </div>
           <div>
             <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Total Transaksi</p>
-            <p className="text-lg font-black text-stone-900">{loading ? "..." : transactions.length}</p>
+            {loading ? (
+              <div className="h-6 w-16 bg-stone-100 rounded animate-pulse mt-1" />
+            ) : (
+              <p className="text-lg font-black text-stone-900">{summary?.totalCount ?? 0}</p>
+            )}
           </div>
         </div>
         <div className="sketch-card bg-white p-4 flex items-center gap-4">
@@ -212,7 +302,11 @@ export default function TransactionsPage() {
           </div>
           <div>
             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Total Masuk</p>
-            <p className="text-lg font-black text-stone-900">{loading ? "..." : formatRp(totalIncome)}</p>
+            {loading ? (
+              <div className="h-6 w-24 bg-stone-100 rounded animate-pulse mt-1" />
+            ) : (
+              <p className="text-lg font-black text-stone-900">{formatRp(summary?.totalIncome ?? 0)}</p>
+            )}
           </div>
         </div>
         <div className="sketch-card bg-white p-4 flex items-center gap-4">
@@ -221,7 +315,11 @@ export default function TransactionsPage() {
           </div>
           <div>
             <p className="text-[10px] font-black text-[#E35B30] uppercase tracking-widest">Total Keluar</p>
-            <p className="text-lg font-black text-stone-900">{loading ? "..." : formatRp(totalExpense)}</p>
+            {loading ? (
+              <div className="h-6 w-24 bg-stone-100 rounded animate-pulse mt-1" />
+            ) : (
+              <p className="text-lg font-black text-stone-900">{formatRp(summary?.totalExpense ?? 0)}</p>
+            )}
           </div>
         </div>
       </div>
@@ -229,7 +327,7 @@ export default function TransactionsPage() {
       {/* ─── Filter Tabs ─── */}
       <div className="flex items-center gap-2">
         {(["all", "INCOME", "EXPENSE"] as const).map((f) => (
-          <button key={f} onClick={() => setFilter(f)}
+          <button key={f} onClick={() => handleFilterChange(f)}
             className={`px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all border ${filter === f
               ? f === "INCOME" ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                 : f === "EXPENSE" ? "bg-orange-50 border-orange-200 text-[#E35B30]"
@@ -238,7 +336,7 @@ export default function TransactionsPage() {
               }`}>
             {f === "all" ? "Semua" : f === "INCOME" ? "🟢 Masuk" : "🔴 Keluar"}
             <span className="ml-1.5 opacity-60">
-              ({f === "all" ? transactions.length : transactions.filter((t) => t.type === f).length})
+              ({f === "all" ? (summary?.totalCount ?? 0) : f === "INCOME" ? incomeCount : expenseCount})
             </span>
           </button>
         ))}
@@ -247,21 +345,6 @@ export default function TransactionsPage() {
       {/* ─── Transaction Table ─── */}
       <div className="sketch-card bg-white overflow-hidden">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-            <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
-            <p className="text-sm font-bold text-stone-400">Memuat...</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-stone-100 flex items-center justify-center">
-              <ArrowLeftRight className="w-6 h-6 text-stone-300" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-stone-400">Belum ada transaksi</p>
-              <p className="text-xs text-stone-300 mt-1">Tekan tombol di atas untuk mencatat.</p>
-            </div>
-          </div>
-        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-bold">
               <thead>
@@ -276,46 +359,128 @@ export default function TransactionsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E7DED4]/40">
-                {filtered.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-stone-50/60 transition-colors group">
-                    <td className="p-4 text-stone-500 whitespace-nowrap">{formatDate(tx.date)}</td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${tx.type === "INCOME" ? "bg-emerald-50" : "bg-orange-50"}`}>
-                          {tx.type === "INCOME"
-                            ? <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
-                            : <ArrowDownRight className="w-3.5 h-3.5 text-[#E35B30]" />}
-                        </div>
-                        <span className="text-stone-900 font-bold">{tx.description}</span>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 bg-stone-100 text-stone-600 rounded-lg text-[10px] whitespace-nowrap font-bold">{tx.category}</span>
-                    </td>
-                    <td className="p-4">
-                      {tx.account ? (
-                        <span className="px-2.5 py-1 bg-primary/5 text-primary rounded-lg text-[10px] whitespace-nowrap font-bold">{tx.account}</span>
-                      ) : (
-                        <span className="text-stone-300">—</span>
-                      )}
-                    </td>
-                    <td className="p-4 text-stone-400 font-medium">{tx.note || "—"}</td>
-                    <td className={`p-4 text-right font-black whitespace-nowrap ${tx.type === "INCOME" ? "text-emerald-600" : "text-stone-900"}`}>
-                      {tx.type === "INCOME" ? "+" : "−"}{formatRp(tx.amount)}
-                    </td>
-                    <td className="p-4">
-                      <button onClick={() => handleDelete(tx.id)} disabled={deletingId === tx.id}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 disabled:opacity-100 disabled:hover:bg-transparent disabled:hover:text-stone-300 transition-all">
-                        {deletingId === tx.id
-                          ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          : <Trash2 className="w-3.5 h-3.5" />}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
               </tbody>
             </table>
           </div>
+        ) : transactions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-stone-100 flex items-center justify-center">
+              <ArrowLeftRight className="w-6 h-6 text-stone-300" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-stone-400">Belum ada transaksi</p>
+              <p className="text-xs text-stone-300 mt-1">Tekan tombol di atas untuk mencatat.</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className={`overflow-x-auto transition-opacity duration-200 ${loadingPage ? "opacity-50" : "opacity-100"}`}>
+              <table className="w-full text-left text-xs font-bold">
+                <thead>
+                  <tr className="border-b border-[#E7DED4] text-stone-400 uppercase tracking-wider text-[10px]">
+                    <th className="p-4">Tanggal</th>
+                    <th className="p-4">Keterangan</th>
+                    <th className="p-4">Kategori</th>
+                    <th className="p-4">Kantong</th>
+                    <th className="p-4">Catatan</th>
+                    <th className="p-4 text-right">Jumlah</th>
+                    <th className="p-4 w-10"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E7DED4]/40">
+                  {transactions.map((tx) => (
+                    <tr key={tx.id} className="hover:bg-stone-50/60 transition-colors group">
+                      <td className="p-4 text-stone-500 whitespace-nowrap">{formatDate(tx.date)}</td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${tx.type === "INCOME" ? "bg-emerald-50" : "bg-orange-50"}`}>
+                            {tx.type === "INCOME"
+                              ? <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
+                              : <ArrowDownRight className="w-3.5 h-3.5 text-[#E35B30]" />}
+                          </div>
+                          <span className="text-stone-900 font-bold">{tx.description}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-2.5 py-1 bg-stone-100 text-stone-600 rounded-lg text-[10px] whitespace-nowrap font-bold">{tx.category}</span>
+                      </td>
+                      <td className="p-4">
+                        {tx.account ? (
+                          <span className="px-2.5 py-1 bg-primary/5 text-primary rounded-lg text-[10px] whitespace-nowrap font-bold">{tx.account}</span>
+                        ) : (
+                          <span className="text-stone-300">—</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-stone-400 font-medium">{tx.note || "—"}</td>
+                      <td className={`p-4 text-right font-black whitespace-nowrap ${tx.type === "INCOME" ? "text-emerald-600" : "text-stone-900"}`}>
+                        {tx.type === "INCOME" ? "+" : "−"}{formatRp(tx.amount)}
+                      </td>
+                      <td className="p-4">
+                        <button onClick={() => handleDelete(tx.id)} disabled={deletingId === tx.id}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 disabled:opacity-100 disabled:hover:bg-transparent disabled:hover:text-stone-300 transition-all">
+                          {deletingId === tx.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : <Trash2 className="w-3.5 h-3.5" />}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ─── Pagination ─── */}
+            {totalCount > 0 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t border-[#E7DED4] bg-stone-50/50">
+                <p className="text-[10px] font-bold text-stone-400">
+                  Menampilkan <span className="text-stone-600">{startIdx}</span>–<span className="text-stone-600">{endIdx}</span> dari <span className="text-stone-600">{totalCount}</span> transaksi
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page <= 1 || loadingPage}
+                    className="p-1.5 rounded-lg border border-[#E7DED4] bg-white text-stone-500 hover:bg-stone-100 disabled:opacity-40 disabled:hover:bg-white transition-all"
+                    aria-label="Halaman sebelumnya"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                    .reduce<Array<number | "ellipsis">>((acc, p, idx, arr) => {
+                      if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("ellipsis");
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, idx) =>
+                      p === "ellipsis" ? (
+                        <span key={`e-${idx}`} className="px-1 text-[10px] text-stone-400 font-bold">…</span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => handlePageChange(p)}
+                          disabled={loadingPage}
+                          className={`w-7 h-7 rounded-lg text-[10px] font-extrabold transition-all ${page === p
+                            ? "bg-stone-900 text-white shadow-sm"
+                            : "border border-[#E7DED4] bg-white text-stone-500 hover:bg-stone-100"
+                            }`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+                  <button
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page >= totalPages || loadingPage}
+                    className="p-1.5 rounded-lg border border-[#E7DED4] bg-white text-stone-500 hover:bg-stone-100 disabled:opacity-40 disabled:hover:bg-white transition-all"
+                    aria-label="Halaman berikutnya"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

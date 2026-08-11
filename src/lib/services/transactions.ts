@@ -21,17 +21,61 @@ const SELECT_FIELDS = `
   t.amount::float AS amount, t.type, t.note
 `;
 
-export async function getTransactions(userId: string): Promise<TransactionRow[]> {
-    const { rows } = await pool.query(
-        `SELECT ${SELECT_FIELDS}
-     FROM transactions t
-     JOIN categories c ON c.id = t.category_id
-     LEFT JOIN accounts a ON a.id = t.account_id
-     WHERE t.user_id = $1
-     ORDER BY t.date DESC`,
-        [userId]
-    );
+export interface GetTransactionsParams {
+    limit?: number;
+    offset?: number;
+    type?: TxType;
+}
+
+export async function getTransactions(userId: string, params: GetTransactionsParams = {}): Promise<TransactionRow[]> {
+    const { limit, offset, type } = params;
+    const conditions = ["t.user_id = $1"];
+    const values: unknown[] = [userId];
+    let paramIdx = 2;
+
+    if (type) {
+        conditions.push(`t.type = $${paramIdx++}`);
+        values.push(type);
+    }
+
+    let sql = `
+        SELECT ${SELECT_FIELDS}
+        FROM transactions t
+        JOIN categories c ON c.id = t.category_id
+        LEFT JOIN accounts a ON a.id = t.account_id
+        WHERE ${conditions.join(" AND ")}
+        ORDER BY t.date DESC
+    `;
+
+    if (limit !== undefined) {
+        sql += ` LIMIT $${paramIdx++}`;
+        values.push(limit);
+    }
+    if (offset !== undefined) {
+        sql += ` OFFSET $${paramIdx++}`;
+        values.push(offset);
+    }
+
+    const { rows } = await pool.query(sql, values);
     return rows;
+}
+
+export async function getTransactionsCount(userId: string, type?: TxType): Promise<number> {
+    const conditions = ["user_id = $1"];
+    const values: unknown[] = [userId];
+    if (type) {
+        conditions.push(`type = $2`);
+        values.push(type);
+    }
+    const { rows } = await pool.query(
+        `SELECT COUNT(*)::int AS count FROM transactions WHERE ${conditions.join(" AND ")}`,
+        values
+    );
+    return rows[0].count;
+}
+
+export async function getRecentTransactions(userId: string, limit = 5): Promise<TransactionRow[]> {
+    return getTransactions(userId, { limit });
 }
 
 export async function createTransaction(data: {
@@ -103,6 +147,19 @@ export async function getExpenseByCategory(userId: string) {
     return rows;
 }
 
+export async function getIncomeByCategory(userId: string) {
+    const { rows } = await pool.query(
+        `SELECT c.name AS category, SUM(t.amount)::float AS total
+     FROM transactions t
+     JOIN categories c ON c.id = t.category_id
+     WHERE t.user_id = $1 AND t.type = 'INCOME'
+     GROUP BY c.name
+     ORDER BY total DESC`,
+        [userId]
+    );
+    return rows;
+}
+
 export async function getMonthlySummary(userId: string, months: number = 5) {
     const { rows } = await pool.query(
         `SELECT
@@ -116,20 +173,6 @@ export async function getMonthlySummary(userId: string, months: number = 5) {
      GROUP BY date_trunc('month', date)
      ORDER BY month_start ASC`,
         [userId, months]
-    );
-    return rows;
-}
-
-export async function getRecentTransactions(userId: string, limit = 5): Promise<TransactionRow[]> {
-    const { rows } = await pool.query(
-        `SELECT ${SELECT_FIELDS}
-     FROM transactions t
-     JOIN categories c ON c.id = t.category_id
-     LEFT JOIN accounts a ON a.id = t.account_id
-     WHERE t.user_id = $1
-     ORDER BY t.date DESC
-     LIMIT $2`,
-        [userId, limit]
     );
     return rows;
 }

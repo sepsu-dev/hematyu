@@ -26,7 +26,7 @@ import {
   getMonthlySummaryAction,
   getWeeklySummaryAction,
   getExpenseBreakdownAction,
-  getTransactionsAction,
+  getIncomeBreakdownAction,
 } from "@/app/dashboard/actions";
 
 interface MonthlyRow {
@@ -88,23 +88,13 @@ export default function ReportsPage() {
       getMonthlySummaryAction(),
       getWeeklySummaryAction(),
       getExpenseBreakdownAction(),
-      getTransactionsAction(),
+      getIncomeBreakdownAction(),
     ])
-      .then(([monthly, weekly, breakdown, allTx]) => {
+      .then(([monthly, weekly, breakdown, income]) => {
         setMonthlyData(monthly);
         setWeeklyData(weekly);
         setExpenseBreakdown(breakdown);
-        const incomeMap = (allTx as { type: string; category: string; amount: number }[])
-          .filter((t) => t.type === "INCOME")
-          .reduce<Record<string, number>>((acc, t) => {
-            acc[t.category] = (acc[t.category] || 0) + t.amount;
-            return acc;
-          }, {});
-        setIncomeBreakdown(
-          Object.entries(incomeMap)
-            .map(([category, total]) => ({ category, total }))
-            .sort((a, b) => b.total - a.total)
-        );
+        setIncomeBreakdown(income);
         setLoading(false);
       })
       .catch(() => setLoading(false));

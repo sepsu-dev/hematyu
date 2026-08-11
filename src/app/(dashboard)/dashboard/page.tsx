@@ -23,7 +23,8 @@ import {
   Cell,
 } from "recharts";
 import {
-  getTransactionsAction,
+  getRecentTransactionsAction,
+  getSummaryAction,
   deleteTransactionAction,
   getMonthlySummaryAction,
   getExpenseBreakdownAction,
@@ -39,6 +40,13 @@ interface Transaction {
   amount: number;
   type: TxType;
   note: string | null;
+}
+
+interface Summary {
+  totalIncome: number;
+  totalExpense: number;
+  balance: number;
+  totalCount: number;
 }
 
 interface MonthlyRow {
@@ -76,18 +84,21 @@ function formatDate(d: string | Date) {
 
 export default function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyRow[]>([]);
   const [expenseBreakdown, setExpenseBreakdown] = useState<BreakdownItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      getTransactionsAction(),
+      getRecentTransactionsAction(6),
+      getSummaryAction(),
       getMonthlySummaryAction(),
       getExpenseBreakdownAction(),
     ])
-      .then(([tx, monthly, breakdown]) => {
+      .then(([tx, sum, monthly, breakdown]) => {
         setTransactions(tx);
+        setSummary(sum);
         setMonthlyData(monthly);
         setExpenseBreakdown(breakdown);
         setLoading(false);
@@ -95,20 +106,19 @@ export default function DashboardPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const totalIncome = transactions
-    .filter((t) => t.type === "INCOME")
-    .reduce((s, t) => s + t.amount, 0);
-  const totalExpense = transactions
-    .filter((t) => t.type === "EXPENSE")
-    .reduce((s, t) => s + t.amount, 0);
-  const balance = totalIncome - totalExpense;
+  const totalIncome = summary?.totalIncome ?? 0;
+  const totalExpense = summary?.totalExpense ?? 0;
+  const balance = summary?.balance ?? 0;
+  const totalCount = summary?.totalCount ?? 0;
 
   const handleDelete = async (id: string) => {
     await deleteTransactionAction(id);
     setTransactions((prev) => prev.filter((t) => t.id !== id));
+    const sum = await getSummaryAction();
+    setSummary(sum);
   };
 
-  const recentTx = transactions.slice(0, 6);
+  const recentTx = transactions;
 
   const donutData = expenseBreakdown.map(({ category, total }) => ({
     name: category,
@@ -157,7 +167,7 @@ export default function DashboardPage() {
           <div>
             <p className="text-2xl font-black text-stone-900 tracking-tight">{loading ? "..." : formatRp(totalIncome)}</p>
             <p className="text-[10px] text-stone-400 font-semibold mt-1">
-              {transactions.filter((t) => t.type === "INCOME").length} transaksi pemasukan
+              {summary?.totalCount ? "Total semua transaksi" : "0 transaksi pemasukan"}
             </p>
           </div>
           <div className="h-1 w-full bg-emerald-100 rounded-full" />
@@ -173,7 +183,7 @@ export default function DashboardPage() {
           <div>
             <p className="text-2xl font-black text-stone-900 tracking-tight">{loading ? "..." : formatRp(totalExpense)}</p>
             <p className="text-[10px] text-stone-400 font-semibold mt-1">
-              {transactions.filter((t) => t.type === "EXPENSE").length} transaksi pengeluaran
+              {summary?.totalCount ? "Total semua transaksi" : "0 transaksi pengeluaran"}
             </p>
           </div>
           <div className="h-1 w-full bg-orange-100 rounded-full overflow-hidden">
@@ -281,7 +291,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-7 sketch-card bg-white p-6 space-y-4">
           <div>
             <h2 className="text-sm font-extrabold text-stone-900">Transaksi Terakhir</h2>
-            <p className="text-[11px] text-stone-400 mt-0.5">{transactions.length} transaksi tercatat</p>
+            <p className="text-[11px] text-stone-400 mt-0.5">{totalCount} transaksi tercatat</p>
           </div>
           <div className="space-y-1 max-h-[360px] overflow-y-auto pr-1">
             {loading ? (

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:setup": "tsx db/setup.ts"
+    "db:setup": "tsx db/setup.ts",
+    "db:migrate": "tsx db/migrate-indexes.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
