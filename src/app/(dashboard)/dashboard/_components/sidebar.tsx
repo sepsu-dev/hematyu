@@ -4,24 +4,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Wallet,
   ArrowLeftRight,
   PiggyBank,
   Target,
   BarChart3,
   Settings,
+  Wallet,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { ScribbleMark } from "@/components/scribble-mark";
 
 const navigation = [
-  { name: "Dashboard",       href: "/dashboard",              icon: LayoutDashboard },
-  { name: "Akun & Rekening", href: "/dashboard/accounts",    icon: Wallet },
-  { name: "Transaksi",       href: "/dashboard/transactions", icon: ArrowLeftRight },
-  { name: "Anggaran",        href: "/dashboard/budgets",      icon: PiggyBank },
-  { name: "Target",          href: "/dashboard/goals",        icon: Target },
-  { name: "Laporan",         href: "/dashboard/reports",      icon: BarChart3 },
-  { name: "Pengaturan",      href: "/dashboard/settings",     icon: Settings },
+  { name: "Dashboard",       href: "/dashboard",              icon: LayoutDashboard, soon: false },
+  { name: "Transaksi",       href: "/dashboard/transactions", icon: ArrowLeftRight,  soon: false },
+  { name: "Akun & Rekening", href: "/dashboard/accounts",    icon: Wallet,          soon: true  },
+  { name: "Anggaran",        href: "/dashboard/budgets",      icon: PiggyBank,       soon: true  },
+  { name: "Target",          href: "/dashboard/goals",        icon: Target,          soon: true  },
+  { name: "Laporan",         href: "/dashboard/reports",      icon: BarChart3,       soon: false  },
+  { name: "Pengaturan",      href: "/dashboard/settings",     icon: Settings,        soon: false },
 ];
 
 interface DashboardSidebarProps {
@@ -78,16 +77,20 @@ export function DashboardSidebar({ isCollapsed }: DashboardSidebarProps) {
                 }
               `}
             >
-              {/* Active state styling with clean badge block background */}
-
-
-
               <item.icon
                 className={`w-4 h-4 shrink-0 transition-colors ${
                   isActive ? "text-primary" : "text-stone-400"
                 }`}
               />
-              {!isCollapsed && <span>{item.name}</span>}
+              {!isCollapsed && (
+                <span className="flex-1">{item.name}</span>
+              )}
+              {/* Soon badge — only show when sidebar is expanded */}
+              {!isCollapsed && item.soon && (
+                <span className="px-1.5 py-0.5 text-[8px] bg-purple-50 text-purple-500 rounded font-black border border-purple-200 uppercase tracking-widest leading-none">
+                  Soon
+                </span>
+              )}
             </Link>
           );
         })}
