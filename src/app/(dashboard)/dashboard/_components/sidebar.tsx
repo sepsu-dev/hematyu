@@ -14,13 +14,13 @@ import {
 import { Logo } from "@/components/logo";
 
 const navigation = [
-  { name: "Dashboard",       href: "/dashboard",              icon: LayoutDashboard, soon: false },
-  { name: "Transaksi",       href: "/dashboard/transactions", icon: ArrowLeftRight,  soon: false },
-  { name: "Akun & Rekening", href: "/dashboard/accounts",    icon: Wallet,          soon: true  },
-  { name: "Anggaran",        href: "/dashboard/budgets",      icon: PiggyBank,       soon: true  },
-  { name: "Target",          href: "/dashboard/goals",        icon: Target,          soon: true  },
-  { name: "Laporan",         href: "/dashboard/reports",      icon: BarChart3,       soon: false  },
-  { name: "Pengaturan",      href: "/dashboard/settings",     icon: Settings,        soon: false },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, soon: false },
+  { name: "Transaksi", href: "/dashboard/transactions", icon: ArrowLeftRight, soon: false },
+  { name: "Kantong", href: "/dashboard/wallets", icon: Wallet, soon: false },
+  { name: "Anggaran", href: "/dashboard/budgets", icon: PiggyBank, soon: false },
+  { name: "Target", href: "/dashboard/goals", icon: Target, soon: false },
+  { name: "Laporan", href: "/dashboard/reports", icon: BarChart3, soon: false },
+  { name: "Pengaturan", href: "/dashboard/settings", icon: Settings, soon: false },
 ];
 
 interface DashboardSidebarProps {
@@ -78,9 +78,8 @@ export function DashboardSidebar({ isCollapsed }: DashboardSidebarProps) {
               `}
             >
               <item.icon
-                className={`w-4 h-4 shrink-0 transition-colors ${
-                  isActive ? "text-primary" : "text-stone-400"
-                }`}
+                className={`w-4 h-4 shrink-0 transition-colors ${isActive ? "text-primary" : "text-stone-400"
+                  }`}
               />
               {!isCollapsed && (
                 <span className="flex-1">{item.name}</span>

@@ -3,25 +3,30 @@
 import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { useAuthStore } from "@/lib/stores/auth-store";
+import { logoutAction } from "@/app/actions";
 
 interface ProfileDropdownProps {
   isOpen: boolean;
   onToggle: () => void;
-  /** Display name shown in the trigger button */
-  displayName?: string;
-  /** Two-letter avatar initials */
-  initials?: string;
-  email?: string;
 }
 
-export function ProfileDropdown({
-  isOpen,
-  onToggle,
-  displayName = "Jason David",
-  initials = "JD",
-  email = "jason.david@example.com",
-}: ProfileDropdownProps) {
+function initialsOf(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0])
+    .join("")
+    .toUpperCase();
+}
+
+export function ProfileDropdown({ isOpen, onToggle }: ProfileDropdownProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const user = useAuthStore((s) => s.user);
+  const displayName = user?.name ?? "User";
+  const email = user?.email ?? "";
+  const initials = initialsOf(displayName);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -50,12 +55,8 @@ export function ProfileDropdown({
         `}
       >
         {/* Avatar */}
-        <div className="w-6 h-6 rounded-md overflow-hidden border border-stone-900/10 flex items-center justify-center bg-stone-100">
-          <img 
-            src="https://api.dicebear.com/7.x/fun-emoji/png?seed=Jason" 
-            alt={displayName} 
-            className="w-full h-full object-cover"
-          />
+        <div className="w-6 h-6 rounded-md overflow-hidden border border-stone-900/10 flex items-center justify-center bg-stone-900 text-white text-[9px] font-black">
+          {initials}
         </div>
         <span className="text-xs font-bold text-stone-700 hidden sm:inline">
           {displayName}
@@ -92,13 +93,12 @@ export function ProfileDropdown({
 
           <div className="border-t border-stone-100 my-1" />
 
-          <Link
-            href="/"
-            className="flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5 text-red-400" />
-            <span>Keluar</span>
-          </Link>
+          <form action={logoutAction}>
+            <button className="flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors w-full text-left">
+              <LogOut className="w-3.5 h-3.5 text-red-400" />
+              <span>Keluar</span>
+            </button>
+          </form>
         </div>
       )}
     </div>

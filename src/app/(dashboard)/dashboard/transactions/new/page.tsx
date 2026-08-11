@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Tag,
+  Loader2,
 } from "lucide-react";
 import {
   Select,
@@ -17,29 +18,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  getCategoriesAction,
+  getAccountsAction,
+  createTransactionAction,
+} from "@/app/dashboard/actions";
 
 type TxType = "income" | "expense";
 
-const INCOME_CATEGORIES = [
-  "Gaji / Pendapatan",
-  "Freelance / Projek",
-  "Bonus",
-  "Investasi",
-  "Penjualan",
-  "Lainnya",
-];
+interface Category {
+  id: string;
+  name: string;
+  type: "INCOME" | "EXPENSE";
+}
 
-const EXPENSE_CATEGORIES = [
-  "Makanan & Minuman",
-  "Tagihan & Listrik",
-  "Belanja / Toko",
-  "Transportasi",
-  "Langganan / Media",
-  "Kesehatan",
-  "Hiburan",
-  "Pendidikan",
-  "Lainnya",
-];
+interface Account {
+  id: string;
+  name: string;
+  type: "BANK" | "E_WALLET" | "CASH";
+}
 
 function formatRp(n: number) {
   return "Rp " + n.toLocaleString("id-ID");
@@ -55,29 +52,65 @@ export default function NewTransactionPage() {
   const [txType, setTxType] = useState<TxType>(initialType);
   const [desc, setDesc] = useState("");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState(
-    initialType === "income" ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]
-  );
+  const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountId, setAccountId] = useState("");
 
-  const categories = txType === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  useEffect(() => {
+    setLoadingCategories(true);
+    Promise.all([getCategoriesAction(), getAccountsAction()])
+      .then(([data, accData]) => {
+        setCategories(data);
+        setAccounts(accData);
+        setAccountId(accData[0]?.id ?? "");
+        const cats = data.filter((c) => c.type === (initialType === "income" ? "INCOME" : "EXPENSE"));
+        setCategory(cats[0]?.id ?? "");
+      })
+      .catch(() => { })
+      .finally(() => setLoadingCategories(false));
+  }, [initialType]);
+
+  const catsForType = categories.filter((c) => c.type === (txType === "income" ? "INCOME" : "EXPENSE"));
 
   const handleTypeChange = (type: TxType) => {
     setTxType(type);
-    setCategory(type === "income" ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]);
+    const cats = categories.filter((c) => c.type === (type === "income" ? "INCOME" : "EXPENSE"));
+    setCategory(cats[0]?.id ?? "");
     setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     const num = parseInt(amount.replace(/[^0-9]/g, ""), 10);
 
     if (!desc.trim()) { setError("Keterangan tidak boleh kosong."); return; }
     if (isNaN(num) || num <= 0) { setError("Masukkan jumlah yang valid."); return; }
+    if (!category) { setError("Pilih kategori."); return; }
 
-    // Show success briefly then navigate back
+    setSaving(true);
+    setError("");
+    try {
+      await createTransactionAction({
+        categoryId: category,
+        type: txType === "income" ? "INCOME" : "EXPENSE",
+        amount: num,
+        description: desc.trim(),
+        note: note.trim(),
+        accountId: accountId || undefined,
+      });
+    } catch {
+      setError("Gagal menyimpan transaksi.");
+      setSaving(false);
+      return;
+    }
+
     setSuccess(true);
     setTimeout(() => {
       router.push("/dashboard/transactions");
@@ -114,15 +147,13 @@ export default function NewTransactionPage() {
           <button
             type="button"
             onClick={() => handleTypeChange("expense")}
-            className={`flex items-center justify-center gap-2.5 py-3.5 rounded-lg text-sm font-extrabold transition-all ${
-              txType === "expense"
-                ? "bg-white shadow-sm text-[#E35B30] border border-[#E7DED4]"
-                : "text-stone-400 hover:text-stone-600"
-            }`}
+            className={`flex items-center justify-center gap-2.5 py-3.5 rounded-lg text-sm font-extrabold transition-all ${txType === "expense"
+              ? "bg-white shadow-sm text-[#E35B30] border border-[#E7DED4]"
+              : "text-stone-400 hover:text-stone-600"
+              }`}
           >
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-              txType === "expense" ? "bg-orange-50" : "bg-stone-100"
-            }`}>
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${txType === "expense" ? "bg-orange-50" : "bg-stone-100"
+              }`}>
               <ArrowDownRight className={`w-4 h-4 ${txType === "expense" ? "text-[#E35B30]" : "text-stone-400"}`} />
             </div>
             Uang Keluar
@@ -130,15 +161,13 @@ export default function NewTransactionPage() {
           <button
             type="button"
             onClick={() => handleTypeChange("income")}
-            className={`flex items-center justify-center gap-2.5 py-3.5 rounded-lg text-sm font-extrabold transition-all ${
-              txType === "income"
-                ? "bg-white shadow-sm text-emerald-600 border border-[#E7DED4]"
-                : "text-stone-400 hover:text-stone-600"
-            }`}
+            className={`flex items-center justify-center gap-2.5 py-3.5 rounded-lg text-sm font-extrabold transition-all ${txType === "income"
+              ? "bg-white shadow-sm text-emerald-600 border border-[#E7DED4]"
+              : "text-stone-400 hover:text-stone-600"
+              }`}
           >
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-              txType === "income" ? "bg-emerald-50" : "bg-stone-100"
-            }`}>
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${txType === "income" ? "bg-emerald-50" : "bg-stone-100"
+              }`}>
               <ArrowUpRight className={`w-4 h-4 ${txType === "income" ? "text-emerald-600" : "text-stone-400"}`} />
             </div>
             Uang Masuk
@@ -146,19 +175,16 @@ export default function NewTransactionPage() {
         </div>
 
         {/* Amount Display */}
-        <div className={`rounded-xl p-5 border-2 transition-colors ${
-          txType === "income"
-            ? "bg-emerald-50 border-emerald-200"
-            : "bg-orange-50 border-orange-200"
-        }`}>
-          <p className={`text-[11px] font-extrabold uppercase tracking-widest mb-2 ${
-            txType === "income" ? "text-emerald-600" : "text-[#E35B30]"
+        <div className={`rounded-xl p-5 border-2 transition-colors ${txType === "income"
+          ? "bg-emerald-50 border-emerald-200"
+          : "bg-orange-50 border-orange-200"
           }`}>
+          <p className={`text-[11px] font-extrabold uppercase tracking-widest mb-2 ${txType === "income" ? "text-emerald-600" : "text-[#E35B30]"
+            }`}>
             {txType === "income" ? "Jumlah Masuk" : "Jumlah Keluar"}
           </p>
-          <p className={`text-3xl font-black tracking-tight ${
-            txType === "income" ? "text-emerald-700" : "text-[#E35B30]"
-          }`}>
+          <p className={`text-3xl font-black tracking-tight ${txType === "income" ? "text-emerald-700" : "text-[#E35B30]"
+            }`}>
             {numericAmount > 0 ? formatRp(numericAmount) : "Rp 0"}
           </p>
         </div>
@@ -208,13 +234,12 @@ export default function NewTransactionPage() {
                   key={n}
                   type="button"
                   onClick={() => setAmount(String(n))}
-                  className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition-all ${
-                    amount === String(n)
-                      ? txType === "income"
-                        ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                        : "bg-orange-100 text-[#E35B30] border border-orange-200"
-                      : "bg-stone-100 hover:bg-stone-200 text-stone-600 border border-transparent"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition-all ${amount === String(n)
+                    ? txType === "income"
+                      ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                      : "bg-orange-100 text-[#E35B30] border border-orange-200"
+                    : "bg-stone-100 hover:bg-stone-200 text-stone-600 border border-transparent"
+                    }`}
                 >
                   {n >= 1000000 ? `${n / 1000000}jt` : `${n / 1000}rb`}
                 </button>
@@ -234,13 +259,35 @@ export default function NewTransactionPage() {
                 Kelola Kategori
               </Link>
             </div>
-            <Select value={category} onValueChange={setCategory}>
+            {loadingCategories ? (
+              <div className="h-11 rounded-xl border border-[#E7DED4] bg-[#FAF6F0] flex items-center justify-center gap-2 text-stone-400">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-xs font-bold">Memuat kategori...</span>
+              </div>
+            ) : (
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="h-11 rounded-xl text-sm">
+                  <SelectValue placeholder="Pilih kategori..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {catsForType.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          {/* Kantong */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Kantong</label>
+            <Select value={accountId} onValueChange={setAccountId}>
               <SelectTrigger className="h-11 rounded-xl text-sm">
-                <SelectValue placeholder="Pilih kategori..." />
+                <SelectValue placeholder="Pilih kantong..." />
               </SelectTrigger>
               <SelectContent>
-                {categories.map(c => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                {accounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -278,17 +325,21 @@ export default function NewTransactionPage() {
             </Link>
             <button
               type="submit"
-              disabled={success}
-              className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-white text-sm font-extrabold shadow-sm transition-all active:scale-[0.98] disabled:opacity-70 ${
-                success
-                  ? "bg-emerald-500"
-                  : txType === "income"
+              disabled={success || saving}
+              className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-white text-sm font-extrabold shadow-sm transition-all active:scale-[0.98] disabled:opacity-70 ${success
+                ? "bg-emerald-500"
+                : txType === "income"
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-[#E35B30] hover:bg-[#c94d27]"
-              }`}
+                }`}
             >
               {success ? (
                 <>✓ Tersimpan!</>
+              ) : saving ? (
+                <>
+                  <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                  Menyimpan...
+                </>
               ) : (
                 <>
                   <PlusCircle className="w-4.5 h-4.5" />

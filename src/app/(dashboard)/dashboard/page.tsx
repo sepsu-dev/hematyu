@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -10,91 +10,114 @@ import {
   TrendingDown,
   Trash2,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import {
+  getTransactionsAction,
+  deleteTransactionAction,
+  getMonthlySummaryAction,
+  getExpenseBreakdownAction,
+} from "@/app/dashboard/actions";
 
-const INCOME_CATEGORIES = [
-  "Gaji / Pendapatan",
-  "Freelance / Projek",
-  "Bonus",
-  "Investasi",
-  "Penjualan",
-  "Lainnya",
-];
-
-const EXPENSE_CATEGORIES = [
-  "Makanan & Minuman",
-  "Tagihan & Listrik",
-  "Belanja / Toko",
-  "Transportasi",
-  "Langganan / Media",
-  "Kesehatan",
-  "Hiburan",
-  "Pendidikan",
-  "Lainnya",
-];
-
-type TxType = "income" | "expense";
+type TxType = "INCOME" | "EXPENSE";
 
 interface Transaction {
-  id: number;
-  date: string;
-  desc: string;
+  id: string;
+  date: string | Date;
+  description: string;
   category: string;
   amount: number;
   type: TxType;
+  note: string | null;
 }
 
-const initialTransactions: Transaction[] = [
-  { id: 1, date: "28 Okt", desc: "Kopi & Snack", category: "Makanan & Minuman", amount: 55000, type: "expense" },
-  { id: 2, date: "27 Okt", desc: "Gaji Bulanan", category: "Gaji / Pendapatan", amount: 15000000, type: "income" },
-  { id: 3, date: "26 Okt", desc: "Tagihan Listrik", category: "Tagihan & Listrik", amount: 750000, type: "expense" },
-  { id: 4, date: "25 Okt", desc: "Belanja Tokopedia", category: "Belanja / Toko", amount: 1200000, type: "expense" },
-  { id: 5, date: "24 Okt", desc: "Netflix", category: "Langganan / Media", amount: 186000, type: "expense" },
-];
+interface MonthlyRow {
+  month: string;
+  month_start: string;
+  income: number;
+  expense: number;
+}
+
+interface BreakdownItem {
+  category: string;
+  total: number;
+}
+
+const CATEGORY_HEX: Record<string, string> = {
+  "Makanan & Minuman": "#fb923c",
+  "Tagihan & Listrik": "#facc15",
+  "Belanja / Toko": "#60a5fa",
+  "Transportasi": "#0ea5e9",
+  "Langganan / Media": "#a78bfa",
+  "Kesehatan": "#fb7185",
+  "Hiburan": "#f472b6",
+  "Pendidikan": "#818cf8",
+  "Lainnya": "#a8a29e",
+};
 
 function formatRp(n: number) {
   return "Rp " + n.toLocaleString("id-ID");
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  "Makanan & Minuman": "bg-orange-400",
-  "Tagihan & Listrik": "bg-yellow-400",
-  "Belanja / Toko": "bg-blue-400",
-  "Transportasi": "bg-sky-400",
-  "Langganan / Media": "bg-purple-400",
-  "Kesehatan": "bg-rose-400",
-  "Hiburan": "bg-pink-400",
-  "Pendidikan": "bg-indigo-400",
-  "Lainnya": "bg-stone-400",
-  "Gaji / Pendapatan": "bg-emerald-400",
-  "Freelance / Projek": "bg-teal-400",
-  "Bonus": "bg-green-400",
-  "Investasi": "bg-lime-400",
-  "Penjualan": "bg-cyan-400",
-};
+function formatDate(d: string | Date) {
+  const date = new Date(d);
+  return date.toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
+}
 
 export default function DashboardPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyRow[]>([]);
+  const [expenseBreakdown, setExpenseBreakdown] = useState<BreakdownItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const totalIncome = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  useEffect(() => {
+    Promise.all([
+      getTransactionsAction(),
+      getMonthlySummaryAction(),
+      getExpenseBreakdownAction(),
+    ])
+      .then(([tx, monthly, breakdown]) => {
+        setTransactions(tx);
+        setMonthlyData(monthly);
+        setExpenseBreakdown(breakdown);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const totalIncome = transactions
+    .filter((t) => t.type === "INCOME")
+    .reduce((s, t) => s + t.amount, 0);
+  const totalExpense = transactions
+    .filter((t) => t.type === "EXPENSE")
+    .reduce((s, t) => s + t.amount, 0);
   const balance = totalIncome - totalExpense;
 
-  const handleDelete = (id: number) => setTransactions(prev => prev.filter(t => t.id !== id));
-
-  // Expense breakdown by category
-  const expenseByCategory = EXPENSE_CATEGORIES
-    .map(cat => ({
-      cat,
-      total: transactions.filter(t => t.type === "expense" && t.category === cat).reduce((s, t) => s + t.amount, 0),
-    }))
-    .filter(x => x.total > 0)
-    .sort((a, b) => b.total - a.total);
+  const handleDelete = async (id: string) => {
+    await deleteTransactionAction(id);
+    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const recentTx = transactions.slice(0, 6);
 
+  const donutData = expenseBreakdown.map(({ category, total }) => ({
+    name: category,
+    value: total,
+  }));
+  const topDonut = donutData.slice(0, 6);
+
   return (
     <div className="space-y-6">
-
       {/* ─── Page Title ─── */}
       <div>
         <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Dashboard</h1>
@@ -103,7 +126,6 @@ export default function DashboardPage() {
 
       {/* ─── Summary Cards ─── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Balance */}
         <div className="sketch-card bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -113,7 +135,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <p className={`text-2xl font-black tracking-tight ${balance >= 0 ? "text-stone-900" : "text-red-600"}`}>
-              {formatRp(balance)}
+              {loading ? "..." : formatRp(balance)}
             </p>
             <p className="text-[10px] text-stone-400 font-semibold mt-1">Total masuk − total keluar</p>
           </div>
@@ -125,7 +147,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Income */}
         <div className="sketch-card bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
@@ -134,15 +155,14 @@ export default function DashboardPage() {
             <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Uang Masuk</span>
           </div>
           <div>
-            <p className="text-2xl font-black text-stone-900 tracking-tight">{formatRp(totalIncome)}</p>
+            <p className="text-2xl font-black text-stone-900 tracking-tight">{loading ? "..." : formatRp(totalIncome)}</p>
             <p className="text-[10px] text-stone-400 font-semibold mt-1">
-              {transactions.filter(t => t.type === "income").length} transaksi pemasukan
+              {transactions.filter((t) => t.type === "INCOME").length} transaksi pemasukan
             </p>
           </div>
           <div className="h-1 w-full bg-emerald-100 rounded-full" />
         </div>
 
-        {/* Expense */}
         <div className="sketch-card bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
@@ -151,9 +171,9 @@ export default function DashboardPage() {
             <span className="text-[9px] font-black text-[#E35B30] uppercase tracking-widest">Uang Keluar</span>
           </div>
           <div>
-            <p className="text-2xl font-black text-stone-900 tracking-tight">{formatRp(totalExpense)}</p>
+            <p className="text-2xl font-black text-stone-900 tracking-tight">{loading ? "..." : formatRp(totalExpense)}</p>
             <p className="text-[10px] text-stone-400 font-semibold mt-1">
-              {transactions.filter(t => t.type === "expense").length} transaksi pengeluaran
+              {transactions.filter((t) => t.type === "EXPENSE").length} transaksi pengeluaran
             </p>
           </div>
           <div className="h-1 w-full bg-orange-100 rounded-full overflow-hidden">
@@ -165,9 +185,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ─── Main Grid: Form + Tx List + Category Breakdown ─── */}
+      {/* ─── Main Grid ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
         {/* Quick Add CTAs */}
         <div className="lg:col-span-4 space-y-4">
           <div>
@@ -208,32 +227,83 @@ export default function DashboardPage() {
           </Link>
         </div>
 
+        {/* Cash Flow Area Chart */}
+        <div className="lg:col-span-8 sketch-card bg-white p-6 space-y-4">
+          <div>
+            <h2 className="text-sm font-extrabold text-stone-900">Tren Arus Kas</h2>
+            <p className="text-[11px] text-stone-400 mt-0.5">Pemasukan vs pengeluaran 5 bulan terakhir</p>
+          </div>
+          <div className="flex items-center gap-4 text-[11px] font-bold text-stone-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-primary inline-block" />Masuk
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-[#E35B30] inline-block" />Keluar
+            </span>
+          </div>
+          <div className="h-56">
+            {loading ? (
+              <p className="text-sm font-bold text-stone-300 w-full text-center py-20">Memuat...</p>
+            ) : monthlyData.every((m) => m.income === 0 && m.expense === 0) ? (
+              <p className="text-sm font-bold text-stone-300 w-full text-center py-20">Belum ada data</p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={monthlyData} margin={{ top: 5, right: 5, left: -18, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gradIncome" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#8B5CF6" stopOpacity={0.02} />
+                    </linearGradient>
+                    <linearGradient id="gradExpense" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#E35B30" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#E35B30" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EFE7DD" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#A8A29E", fontWeight: 700 }} axisLine={{ stroke: "#E7DED4" }} tickLine={false} />
+                  <YAxis tickFormatter={(v: number) => (v >= 1000000 ? `${(v / 1000000).toFixed(0)}jt` : `${(v / 1000).toFixed(0)}k`)} tick={{ fontSize: 10, fill: "#A8A29E", fontWeight: 700 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    formatter={(value) => formatRp(Number(value ?? 0))}
+                    contentStyle={{ borderRadius: 12, border: "1px solid #E7DED4", fontSize: 12, fontWeight: 700, boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}
+                  />
+                  <Area type="monotone" dataKey="income" name="Masuk" stroke="#8B5CF6" strokeWidth={2.5} fill="url(#gradIncome)" />
+                  <Area type="monotone" dataKey="expense" name="Keluar" stroke="#E35B30" strokeWidth={2.5} fill="url(#gradExpense)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Bottom Grid ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Recent Transactions */}
-        <div className="lg:col-span-5 sketch-card bg-white p-6 space-y-4">
+        <div className="lg:col-span-7 sketch-card bg-white p-6 space-y-4">
           <div>
             <h2 className="text-sm font-extrabold text-stone-900">Transaksi Terakhir</h2>
             <p className="text-[11px] text-stone-400 mt-0.5">{transactions.length} transaksi tercatat</p>
           </div>
-          <div className="space-y-1 max-h-[400px] overflow-y-auto pr-1">
-            {recentTx.map(tx => (
+          <div className="space-y-1 max-h-[360px] overflow-y-auto pr-1">
+            {loading ? (
+              <p className="text-center py-12 text-stone-300 text-sm font-bold">Memuat...</p>
+            ) : recentTx.map((tx) => (
               <div key={tx.id}
                 className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-[#FAF6F0] transition-all group cursor-default">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    tx.type === "income" ? "bg-emerald-50" : "bg-orange-50"
-                  }`}>
-                    {tx.type === "income"
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${tx.type === "INCOME" ? "bg-emerald-50" : "bg-orange-50"
+                    }`}>
+                    {tx.type === "INCOME"
                       ? <ArrowUpRight className="w-4 h-4 text-emerald-600" />
                       : <ArrowDownRight className="w-4 h-4 text-[#E35B30]" />}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-extrabold text-stone-800 truncate">{tx.desc}</p>
-                    <p className="text-[10px] text-stone-400">{tx.date} · {tx.category}</p>
+                    <p className="text-xs font-extrabold text-stone-800 truncate">{tx.description}</p>
+                    <p className="text-[10px] text-stone-400">{formatDate(tx.date)} · {tx.category}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-xs font-black ${tx.type === "income" ? "text-emerald-600" : "text-stone-800"}`}>
-                    {tx.type === "income" ? "+" : "−"}{formatRp(tx.amount)}
+                  <span className={`text-xs font-black ${tx.type === "INCOME" ? "text-emerald-600" : "text-stone-800"}`}>
+                    {tx.type === "INCOME" ? "+" : "−"}{formatRp(tx.amount)}
                   </span>
                   <button onClick={() => handleDelete(tx.id)}
                     className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 transition-all">
@@ -242,7 +312,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
-            {transactions.length === 0 && (
+            {!loading && transactions.length === 0 && (
               <div className="text-center py-12 text-stone-300">
                 <p className="text-sm font-bold">Belum ada transaksi</p>
               </div>
@@ -250,33 +320,60 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Category Breakdown */}
-        <div className="lg:col-span-3 sketch-card bg-white p-6 space-y-4">
+        {/* Expense Donut */}
+        <div className="lg:col-span-5 sketch-card bg-white p-6 space-y-4">
           <div>
             <h2 className="text-sm font-extrabold text-stone-900">Pengeluaran</h2>
-            <p className="text-[11px] text-stone-400 mt-0.5">Breakdown per kategori</p>
+            <p className="text-[11px] text-stone-400 mt-0.5">Komposisi per kategori</p>
           </div>
-          <div className="space-y-3">
-            {expenseByCategory.length === 0 ? (
-              <p className="text-xs text-stone-300 text-center py-8">Belum ada pengeluaran</p>
-            ) : expenseByCategory.map(({ cat, total }) => {
-              const pct = totalExpense > 0 ? (total / totalExpense) * 100 : 0;
-              const color = CATEGORY_COLORS[cat] ?? "bg-stone-400";
-              return (
-                <div key={cat} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-stone-700 truncate max-w-[130px]">{cat}</span>
-                    <span className="text-[10px] font-black text-stone-500">{pct.toFixed(0)}%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className={`h-1.5 ${color} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {loading ? (
+            <p className="text-sm font-bold text-stone-300 text-center py-12">Memuat...</p>
+          ) : donutData.length === 0 ? (
+            <p className="text-xs text-stone-300 text-center py-12">Belum ada pengeluaran</p>
+          ) : (
+            <>
+              <div className="h-44">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={topDonut}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={48}
+                      outerRadius={72}
+                      paddingAngle={2}
+                      strokeWidth={0}
+                    >
+                      {topDonut.map((entry) => (
+                        <Cell key={entry.name} fill={CATEGORY_HEX[entry.name] ?? "#a8a29e"} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => formatRp(Number(value ?? 0))}
+                      contentStyle={{ borderRadius: 12, border: "1px solid #E7DED4", fontSize: 12, fontWeight: 700 }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-2">
+                {topDonut.map((item) => {
+                  const pct = totalExpense > 0 ? (item.value / totalExpense) * 100 : 0;
+                  return (
+                    <div key={item.name} className="flex items-center justify-between">
+                      <span className="flex items-center gap-2 text-[11px] font-bold text-stone-700 truncate">
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: CATEGORY_HEX[item.name] ?? "#a8a29e" }} />
+                        {item.name}
+                      </span>
+                      <span className="text-[10px] font-black text-stone-500">{pct.toFixed(0)}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
-
       </div>
     </div>
   );
