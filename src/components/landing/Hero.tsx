@@ -67,12 +67,11 @@ export function Hero() {
   return (
     <section id="tentang" className="pt-32 pb-20 px-6 md:px-12 relative overflow-hidden bg-[#FAF6F0]">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-
         {/* ─── Left Column: Title & Action ─── */}
         <div className="lg:col-span-5 text-left space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#E35B30]/10 text-[#E35B30] text-[10px] font-bold uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5 fill-current" />
-            <span>Asisten Keuangan WhatsApp AI</span>
+            <span>Asisten Keuangan WhatsApp AI & Manual</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-stone-900">
@@ -89,7 +88,7 @@ export function Hero() {
           </h1>
 
           <p className="text-sm md:text-base text-stone-600 font-semibold leading-relaxed max-w-md">
-            Butuh asisten pintar, info terpercaya, & alat praktis untuk menjawab kebutuhan finansialmu? Hubungi hemat.yu untuk mencatat pengeluaran instan via WA.
+            Butuh alat praktis untuk melacak keuangan harian Anda? Catat setiap uang masuk dan uang keluar secara manual sekarang, dan bersiaplah untuk integrasi asisten pintar via WhatsApp.
           </p>
 
           <div className="flex flex-row items-center gap-4 pt-2">
@@ -115,9 +114,9 @@ export function Hero() {
               <CreditCard className="w-5 h-5 text-[#E35B30]" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider">Catat Otomatis</h3>
+              <h3 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider">Catat Cepat</h3>
               <p className="text-xs text-stone-500 font-semibold mt-1 leading-relaxed">
-                Kirim pesan transaksi via WhatsApp, asisten AI langsung memproses pengeluaran Anda.
+                Catat setiap uang masuk dan keluar dengan formulir yang simpel dan instan.
               </p>
             </div>
           </div>
@@ -141,9 +140,29 @@ export function Hero() {
               <Shield className="w-5 h-5 text-[#10B981]" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider">Tips Finansial</h3>
+              <h3 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider">Grafik Arus Kas</h3>
               <p className="text-xs text-stone-500 font-semibold mt-1 leading-relaxed">
-                Dapatkan evaluasi bulanan & saran hemat personal langsung ke HP Anda.
+                Visualisasikan sisa kas masuk dan keluar secara langsung untuk memantau saldo Anda.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4 */}
+          <div className="flex gap-4 items-start group">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center border-1.5 border-stone-900 shrink-0 group-hover:scale-105 transition-transform relative">
+              <Zap className="w-5 h-5 text-purple-600" />
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-500"></span>
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider">Asisten WA AI</h3>
+                <span className="px-1.5 py-0.5 text-[8px] bg-purple-50 text-purple-600 rounded font-black border border-purple-200 uppercase tracking-widest text-center">Soon</span>
+              </div>
+              <p className="text-xs text-stone-500 font-semibold mt-1 leading-relaxed">
+                Catat pengeluaran instan lewat chat WhatsApp biasa dengan pemrosesan AI otomatis.
               </p>
             </div>
           </div>

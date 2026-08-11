@@ -32,8 +32,8 @@ export default function SettingsPage() {
         <p className="text-xs text-stone-500">Sesuaikan data profil, notifikasi, dan keamanan akun Anda.</p>
       </div>
 
-      <div className="bg-white border border-stone-200 rounded-lg shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-stone-200">
+      <div className="sketch-card bg-white overflow-hidden">
+        <div className="p-6 border-b border-[#E7DED4]">
           <h3 className="text-sm font-extrabold text-stone-900 flex items-center gap-2">
             <User className="w-4 h-4 text-primary" />
             <span>Profil Pribadi</span>
@@ -47,7 +47,7 @@ export default function SettingsPage() {
                 type="text" 
                 value={profile.name}
                 onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-stone-900 font-bold"
+                className="w-full px-3 py-2 bg-white border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-stone-900 font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -56,7 +56,7 @@ export default function SettingsPage() {
                 type="email" 
                 value={profile.email}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-stone-900 font-bold"
+                className="w-full px-3 py-2 bg-white border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-stone-900 font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -65,7 +65,7 @@ export default function SettingsPage() {
                 type="text" 
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-stone-900 font-bold"
+                className="w-full px-3 py-2 bg-white border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-stone-900 font-bold"
               />
             </div>
           </div>

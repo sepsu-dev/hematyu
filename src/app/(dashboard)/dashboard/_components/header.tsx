@@ -24,7 +24,7 @@ export function DashboardHeader({ onToggleSidebar }: DashboardHeaderProps) {
   }
 
   return (
-    <header className="h-16 border-b border-stone-200/80 bg-white/70 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-16 border-b border-[#E7DED4] bg-[#FAF6F0]/70 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">
       {/* Left – sidebar toggle */}
       <div className="flex items-center gap-3">
         <button

@@ -57,9 +57,9 @@ export function Features() {
             <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center border-1.5 border-stone-900">
               <Compass className="w-5 h-5 text-[#E35B30]" />
             </div>
-            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Info Terpercaya</h3>
+            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Catat Cepat</h3>
             <p className="text-xs text-stone-600 font-semibold leading-relaxed max-w-[240px]">
-              Alokasi limit ideal & tip berhemat tervalid langsung untuk Anda.
+              Masukkan pengeluaran dan pemasukan Anda hanya dalam beberapa detik secara manual.
             </p>
           </div>
 
@@ -68,9 +68,9 @@ export function Features() {
             <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center border-1.5 border-stone-900">
               <Heart className="w-5 h-5 text-blue-600" />
             </div>
-            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Alat Pendukung</h3>
+            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Pantau Arus Kas</h3>
             <p className="text-xs text-stone-600 font-semibold leading-relaxed max-w-[240px]">
-              Chat bot WA otomatis, scan OCR struk instan, & grafik arus kas harian.
+              Visualisasikan aliran uang masuk dan keluar secara real-time dengan grafik yang intuitif.
             </p>
           </div>
 
@@ -79,9 +79,9 @@ export function Features() {
             <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center border-1.5 border-stone-900">
               <Star className="w-5 h-5 text-amber-500 fill-current" />
             </div>
-            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Saran Personal</h3>
+            <h3 className="text-base font-extrabold text-stone-900 uppercase tracking-wider">Anggaran Terarah</h3>
             <p className="text-xs text-stone-600 font-semibold leading-relaxed max-w-[240px]">
-              Deteksi jajan berlebih & tip hemat berdasarkan histori transaksi.
+              Tentukan batas belanja bulanan untuk setiap kategori guna menghindari pemborosan.
             </p>
           </div>
 
@@ -94,13 +94,13 @@ export function Features() {
           <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
             <div className="space-y-4">
               <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#E35B30]">Tabungan</span>
-              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">Tantangan Nabung Rutin</h4>
+              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">Target Menabung</h4>
               <p className="text-xs text-stone-600 font-semibold leading-relaxed">
-                Tetapkan goals & tantangan menabung mingguan secara terarah dengan grafik pencapaian yang presisi.
+                Tetapkan goals & tantangan menabung secara teratur dengan grafik pencapaian yang presisi.
               </p>
             </div>
             <div className="pt-6">
-              <Link href="#kalkulator" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
+              <Link href="/dashboard" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
                 Pelajari Selengkapnya 
                 <span className="group-hover:translate-x-0.5 transition-transform">→</span>
               </Link>
@@ -111,13 +111,16 @@ export function Features() {
           <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
             <div className="space-y-4">
               <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#E35B30]">Asisten AI</span>
-              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">Review & Roast AI</h4>
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-lg font-extrabold text-stone-900 leading-tight">Review & Roast AI</h4>
+                <span className="px-1.5 py-0.5 text-[8px] bg-purple-50 text-purple-600 rounded font-black border border-purple-200 uppercase tracking-widest text-center">Soon</span>
+              </div>
               <p className="text-xs text-stone-600 font-semibold leading-relaxed">
                 Asisten AI akan menilai gaya hidup Anda dengan nada santai & lucu agar terpikir dua kali sebelum boros.
               </p>
             </div>
             <div className="pt-6">
-              <Link href="#demo" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
+              <Link href="#fitur" className="text-xs font-bold text-[#E35B30] hover:opacity-85 inline-flex items-center gap-1.5 group">
                 Pelajari Selengkapnya 
                 <span className="group-hover:translate-x-0.5 transition-transform">→</span>
               </Link>
@@ -128,7 +131,10 @@ export function Features() {
           <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left h-full">
             <div className="space-y-4">
               <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#E35B30]">Integrasi</span>
-              <h4 className="text-lg font-extrabold text-stone-900 leading-tight">WhatsApp Logger</h4>
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-lg font-extrabold text-stone-900 leading-tight">WhatsApp Logger</h4>
+                <span className="px-1.5 py-0.5 text-[8px] bg-purple-50 text-purple-600 rounded font-black border border-purple-200 uppercase tracking-widest text-center">Soon</span>
+              </div>
               <p className="text-xs text-stone-600 font-semibold leading-relaxed">
                 Cukup ketik nominal & keterangan transaksi lewat chat WhatsApp, AI kami akan memilah kategori secara otomatis.
               </p>

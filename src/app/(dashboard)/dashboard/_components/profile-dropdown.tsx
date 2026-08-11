@@ -50,8 +50,12 @@ export function ProfileDropdown({
         `}
       >
         {/* Avatar */}
-        <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-bold text-primary uppercase">
-          {initials}
+        <div className="w-6 h-6 rounded-md overflow-hidden border border-stone-900/10 flex items-center justify-center bg-stone-100">
+          <img 
+            src="https://api.dicebear.com/7.x/fun-emoji/png?seed=Jason" 
+            alt={displayName} 
+            className="w-full h-full object-cover"
+          />
         </div>
         <span className="text-xs font-bold text-stone-700 hidden sm:inline">
           {displayName}
@@ -63,7 +67,7 @@ export function ProfileDropdown({
 
       {/* Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-200 rounded-lg shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-xs font-bold">
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E7DED4] rounded-lg shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-xs font-bold">
           {/* User info */}
           <div className="px-4 py-2.5 border-b border-stone-100">
             <p className="text-stone-900 font-bold truncate">{displayName}</p>

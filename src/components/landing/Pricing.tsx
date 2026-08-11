@@ -21,7 +21,10 @@ export function Pricing() {
                 <Wallet className="w-6 h-6 text-[#E35B30]" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-extrabold text-stone-900">Catat via WhatsApp</h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xl font-extrabold text-stone-900">Catat via WhatsApp</h3>
+                  <span className="px-1.5 py-0.5 text-[8px] bg-purple-50 text-purple-600 rounded font-black border border-purple-200 uppercase tracking-widest text-center">Soon</span>
+                </div>
                 <p className="text-[10px] font-bold text-[#E35B30] uppercase tracking-wider">Gratis Selamanya</p>
               </div>
               <ul className="space-y-3.5 pt-2">
@@ -42,7 +45,7 @@ export function Pricing() {
 
           {/* Card 2 */}
           <div className="sketch-card bg-[#FAF6F0] p-8 flex flex-col justify-between text-left relative overflow-hidden">
-            <div className="absolute top-6 right-6 px-3 py-1 bg-[#E35B30]/10 text-[#E35B30] text-[9px] font-extrabold border border-[#E35B30]/20 rounded-full uppercase tracking-wider">Terpopuler</div>
+            <div className="absolute top-6 right-6 px-3 py-1 bg-[#E35B30]/10 text-[#E35B30] text-[9px] font-extrabold border border-[#E35B30]/20 rounded-full uppercase tracking-wider">Aktif</div>
             <div className="space-y-6">
               <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center border-1.5 border-stone-900">
                 <Star className="w-6 h-6 text-blue-600 fill-current" />
@@ -74,7 +77,10 @@ export function Pricing() {
                 <ShieldAlert className="w-6 h-6 text-amber-600" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-extrabold text-stone-900">Fitur Cerdas AI</h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xl font-extrabold text-stone-900">Fitur Cerdas AI</h3>
+                  <span className="px-1.5 py-0.5 text-[8px] bg-purple-50 text-purple-600 rounded font-black border border-purple-200 uppercase tracking-widest text-center">Soon</span>
+                </div>
                 <p className="text-[10px] font-bold text-[#E35B30] uppercase tracking-wider">Gratis Selamanya</p>
               </div>
               <ul className="space-y-3.5 pt-2">

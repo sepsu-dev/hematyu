@@ -20,22 +20,22 @@ export default function TransactionsPage() {
           <p className="text-xs text-stone-500">Lihat semua aliran masuk dan keluar dana Anda secara transparan.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-stone-200 hover:bg-stone-50 rounded-lg text-xs font-bold text-stone-600 shadow-sm transition-colors">
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E7DED4] hover:bg-stone-50 rounded-lg text-xs font-bold text-stone-600 shadow-sm transition-colors">
             <Filter className="w-3.5 h-3.5 text-stone-400" />
             <span>Filter</span>
           </button>
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-stone-200 hover:bg-stone-50 rounded-lg text-xs font-bold text-stone-600 shadow-sm transition-colors">
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E7DED4] hover:bg-stone-50 rounded-lg text-xs font-bold text-stone-600 shadow-sm transition-colors">
             <Download className="w-3.5 h-3.5 text-stone-400" />
             <span>Ekspor</span>
           </button>
         </div>
       </div>
 
-      <div className="bg-white border border-stone-200 rounded-lg shadow-sm">
+      <div className="sketch-card bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-bold">
             <thead>
-              <tr className="border-b border-stone-200 text-stone-400 uppercase tracking-wider text-[10px]">
+              <tr className="border-b border-[#E7DED4] text-stone-400 uppercase tracking-wider text-[10px]">
                 <th className="p-4">Tanggal</th>
                 <th className="p-4">Deskripsi</th>
                 <th className="p-4">Kategori</th>
@@ -43,7 +43,7 @@ export default function TransactionsPage() {
                 <th className="p-4 text-right">Jumlah</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100 text-stone-700">
+            <tbody className="divide-y divide-[#E7DED4]/40 text-stone-700">
               {transactions.map((tx, idx) => (
                 <tr key={idx} className="hover:bg-stone-50/50 transition-colors">
                   <td className="p-4 text-stone-500">{tx.date}</td>

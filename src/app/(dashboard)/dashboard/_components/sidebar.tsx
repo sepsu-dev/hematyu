@@ -34,7 +34,7 @@ export function DashboardSidebar({ isCollapsed }: DashboardSidebarProps) {
   return (
     <aside
       className={`
-        border-r border-stone-200/80 bg-white/80 backdrop-blur-md
+        border-r border-[#E7DED4] bg-[#FAF6F0]/80 backdrop-blur-md
         flex flex-col shrink-0
         fixed inset-y-0 left-0 z-40
         transition-all duration-300
@@ -44,7 +44,7 @@ export function DashboardSidebar({ isCollapsed }: DashboardSidebarProps) {
       {/* Brand */}
       <div
         className={`
-          h-16 flex items-center border-b border-stone-200/80 gap-2
+          h-16 flex items-center border-b border-[#E7DED4] gap-2
           transition-all duration-300
           ${isCollapsed ? "justify-center px-0" : "px-6"}
         `}

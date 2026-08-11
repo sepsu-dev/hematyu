@@ -28,15 +28,15 @@ export function Workflow() {
               tag: "Langkah 01"
             },
             {
-              title: "2. Hubungkan ke WhatsApp",
-              desc: "Ketik transaksi belanja harian Anda seperti chat biasa ke nomor asisten WhatsApp AI.",
+              title: "2. Catat Transaksi",
+              desc: "Ketik pemasukan dan pengeluaran Anda dengan formulir input yang ringkas.",
               icon: MessageSquareCode,
               color: "bg-orange-100 border-stone-900 text-stone-900",
               tag: "Langkah 02"
             },
             {
-              title: "3. Pantau Dashboard",
-              desc: "Analisis grafik pengeluaran real-time dan evaluasi limit budget mingguan secara instan.",
+              title: "3. Evaluasi Grafik",
+              desc: "Analisis grafik keuangan real-time dan evaluasi sisa saldo Anda secara instan.",
               icon: BarChart3,
               color: "bg-yellow-100 border-stone-900 text-stone-900",
               tag: "Langkah 03"

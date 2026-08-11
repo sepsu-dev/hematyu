@@ -24,7 +24,7 @@ export default function GoalsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {goals.map((g, idx) => (
-          <div key={idx} className="bg-white border border-stone-200 rounded-lg p-6 shadow-sm flex flex-col justify-between h-44 hover:border-primary/20 transition-all">
+          <div key={idx} className="sketch-card bg-white p-6 flex flex-col justify-between h-44">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-extrabold text-stone-900">{g.title}</h3>

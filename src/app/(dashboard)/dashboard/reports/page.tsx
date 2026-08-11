@@ -13,13 +13,13 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-xl font-bold text-stone-900 tracking-tight">Laporan Keuangan</h1>
+        <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Laporan Keuangan</h1>
         <p className="text-xs text-stone-500">Analisis pengeluaran dan pertumbuhan aset Anda secara visual.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Monthly comparison bar chart */}
-        <div className="bg-white border border-stone-200 rounded-lg p-6 shadow-sm space-y-6">
+        <div className="sketch-card bg-white p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-stone-900">Perbandingan Bulanan</h3>
@@ -65,7 +65,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Categories Analysis */}
-        <div className="bg-white border border-stone-200 rounded-lg p-6 shadow-sm space-y-6">
+        <div className="sketch-card bg-white p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-stone-900">Distribusi Kategori</h3>
