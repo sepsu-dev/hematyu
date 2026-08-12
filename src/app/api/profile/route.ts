@@ -38,7 +38,6 @@ export async function PATCH(request: Request) {
         userId: user.userId,
         name: parsed.data.name,
         email: parsed.data.email,
-        role: user.role ?? "user",
     });
     const cookieStore = await (await import("next/headers")).cookies();
     cookieStore.set(session.name, session.value, {

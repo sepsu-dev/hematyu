@@ -35,7 +35,8 @@ import {
     updateGoalAmount,
     deleteGoal,
 } from "@/lib/services/goals";
-import { updateProfile, getProfile } from "@/lib/services/profile";
+import { updateProfile, getProfile, setPassword } from "@/lib/services/profile";
+import { hashPassword } from "@/lib/auth/password";
 import { getCategories } from "@/lib/services/categories";
 import { getAccountTypes } from "@/lib/services/accounts";
 import {
@@ -47,6 +48,24 @@ import {
     deleteMasterAccountType,
 } from "@/lib/services/master";
 import { getAdminStats, getAdminUserList } from "@/lib/services/admin";
+import {
+    getRbacUsers,
+    setUserGroups,
+    getGroups,
+    createGroup,
+    updateGroup,
+    deleteGroup,
+    getPrivileges,
+    setPrivilege,
+    getRbacMenus,
+    createMenu,
+    updateMenu,
+    deleteMenu,
+    getMenuActions,
+    createMenuAction as createMenuActionService,
+    deleteMenuAction as deleteMenuActionService,
+} from "@/lib/services/rbac";
+import { isSuperadmin } from "@/lib/services/rbac";
 
 async function requireUser() {
     const session = await verifySession();
@@ -57,7 +76,7 @@ async function requireUser() {
 async function requireSuperadmin() {
     const session = await verifySession();
     if (!session) redirect("/login");
-    if (session.role !== "superadmin") redirect("/dashboard");
+    if (!(await isSuperadmin(session.userId))) redirect("/dashboard");
     return session;
 }
 
@@ -135,38 +154,49 @@ export async function createTransactionAction(input: {
         date: input.date ? new Date(input.date) : undefined,
         accountId: input.accountId,
     });
-    revalidatePath("/dashboard/transactions");
+    revalidatePath("/transactions");
     revalidatePath("/dashboard");
-    revalidatePath("/dashboard/reports");
-    revalidatePath("/dashboard/wallets");
+    revalidatePath("/reports");
+    revalidatePath("/wallets");
 }
 
 export async function deleteTransactionAction(id: string) {
     const session = await requireUser();
     await deleteTransaction(id, session.userId);
-    revalidatePath("/dashboard/transactions");
+    revalidatePath("/transactions");
     revalidatePath("/dashboard");
 }
 
-export async function createCategoryAction(input: { name: string; type: "INCOME" | "EXPENSE" }) {
+export async function createCategoryAction(input: { name: string; type: "INCOME" | "EXPENSE"; iconName?: string; colorHex?: string }) {
     const session = await requireUser();
-    await createCategory({ userId: session.userId, name: input.name, type: input.type });
-    revalidatePath("/dashboard/settings");
+    await createCategory({ userId: session.userId, name: input.name, type: input.type, iconName: input.iconName, colorHex: input.colorHex });
+    revalidatePath("/settings");
 }
 
 export async function deleteCategoryAction(id: string) {
     const session = await requireUser();
     await deleteCategory(id, session.userId);
-    revalidatePath("/dashboard/settings");
+    revalidatePath("/settings");
 }
 
 export async function updateProfileAction(input: { name: string; email: string; phone?: string }) {
     const session = await requireUser();
     await updateProfile(session.userId, input);
-    revalidatePath("/dashboard/settings");
+    revalidatePath("/settings");
 }
 
-// ─── Accounts ────────────────────────────────────────────────────
+export async function createPasswordAction(input: { password: string }) {
+    const session = await requireUser();
+    const password = input.password;
+    if (!password || password.length < 6) {
+        throw new Error("Password minimal 6 karakter");
+    }
+    const hash = await hashPassword(password);
+    await setPassword(session.userId, hash);
+    revalidatePath("/settings");
+}
+
+// ─── Rekening ────────────────────────────────────────────────────
 
 export async function getAccountsAction() {
     const session = await requireUser();
@@ -185,20 +215,20 @@ export async function createAccountAction(input: {
         type: input.type,
         balance: input.balance,
     });
-    revalidatePath("/dashboard/wallets");
+    revalidatePath("/wallets");
 }
 
 export async function deleteAccountAction(id: string) {
     const session = await requireUser();
     await deleteAccount(id, session.userId);
-    revalidatePath("/dashboard/wallets");
+    revalidatePath("/wallets");
 }
 
-// ─── Budgets ─────────────────────────────────────────────────────
+// ─── Anggaran ────────────────────────────────────────────────────
 
-export async function getBudgetsAction() {
+export async function getBudgetsAction(month?: string) {
     const session = await requireUser();
-    return await getBudgets(session.userId);
+    return await getBudgets(session.userId, month);
 }
 
 export async function createBudgetAction(input: { categoryId: string; amount: number }) {
@@ -208,16 +238,16 @@ export async function createBudgetAction(input: { categoryId: string; amount: nu
         categoryId: input.categoryId,
         amount: input.amount,
     });
-    revalidatePath("/dashboard/budgets");
+    revalidatePath("/budgets");
 }
 
 export async function deleteBudgetAction(id: string) {
     const session = await requireUser();
     await deleteBudget(id, session.userId);
-    revalidatePath("/dashboard/budgets");
+    revalidatePath("/budgets");
 }
 
-// ─── Goals ───────────────────────────────────────────────────────
+// ─── Tujuan ──────────────────────────────────────────────────────
 
 export async function getGoalsAction() {
     const session = await requireUser();
@@ -236,48 +266,48 @@ export async function createGoalAction(input: {
         targetAmount: input.targetAmount,
         deadline: input.deadline ? new Date(input.deadline) : undefined,
     });
-    revalidatePath("/dashboard/goals");
+    revalidatePath("/goals");
 }
 
 export async function updateGoalAmountAction(input: { id: string; amount: number }) {
     const session = await requireUser();
     await updateGoalAmount(input.id, session.userId, input.amount);
-    revalidatePath("/dashboard/goals");
+    revalidatePath("/goals");
 }
 
 export async function deleteGoalAction(id: string) {
     const session = await requireUser();
     await deleteGoal(id, session.userId);
-    revalidatePath("/dashboard/goals");
+    revalidatePath("/goals");
 }
 
-// ─── Account Types (Dynamic) ──────────────────────────────────────────────────
+// ─── Jenis Rekening (Dinamis) ─────────────────────────────────────────┐
 
 export async function getAccountTypesAction() {
     await requireUser();
     return await getAccountTypes();
 }
 
-// ─── Master — Categories ──────────────────────────────────────────────────────
+// ─── Admin — Kategori ──────────────────────────────────────────────────
 
 export async function getMasterCategoriesAction() {
     await requireSuperadmin();
     return await getMasterCategories();
 }
 
-export async function createMasterCategoryAction(input: { name: string; type: "INCOME" | "EXPENSE" }) {
+export async function createMasterCategoryAction(input: { name: string; type: "INCOME" | "EXPENSE"; iconName?: string; colorHex?: string }) {
     await requireSuperadmin();
-    await createMasterCategory({ name: input.name, type: input.type });
-    revalidatePath("/dashboard/master/categories");
+    await createMasterCategory({ name: input.name, type: input.type, iconName: input.iconName, colorHex: input.colorHex });
+    revalidatePath("/master/categories");
 }
 
 export async function deleteMasterCategoryAction(id: string) {
     await requireSuperadmin();
     await deleteMasterCategory(id);
-    revalidatePath("/dashboard/master/categories");
+    revalidatePath("/master/categories");
 }
 
-// ─── Master — Account Types ───────────────────────────────────────────────────
+// ─── Admin — Jenis Rekening ───────────────────────────────────────────┐
 
 export async function getMasterAccountTypesAction() {
     await requireSuperadmin();
@@ -292,17 +322,17 @@ export async function createMasterAccountTypeAction(input: {
 }) {
     await requireSuperadmin();
     await createMasterAccountType(input);
-    revalidatePath("/dashboard/master/account-types");
-    revalidatePath("/dashboard/wallets");
+    revalidatePath("/master/account-types");
+    revalidatePath("/wallets");
 }
 
 export async function deleteMasterAccountTypeAction(id: string) {
     await requireSuperadmin();
     await deleteMasterAccountType(id);
-    revalidatePath("/dashboard/master/account-types");
+    revalidatePath("/master/account-types");
 }
 
-// ─── Admin — Stats & User List ────────────────────────────────────────────────
+// ─── Admin — Statistik & Daftar User ─────────────────────────────────
 
 export async function getAdminStatsAction() {
     await requireSuperadmin();
@@ -312,4 +342,111 @@ export async function getAdminStatsAction() {
 export async function getAdminUserListAction() {
     await requireSuperadmin();
     return await getAdminUserList();
+}
+
+// ─── Admin — User Management (RBAC) ─────────────────────────────
+
+export async function getRbacUsersAction() {
+    await requireSuperadmin();
+    return await getRbacUsers();
+}
+
+export async function setUserGroupsAction(userId: string, groupIds: string[]) {
+    await requireSuperadmin();
+    await setUserGroups(userId, groupIds);
+    revalidatePath("/admin/users");
+}
+
+export async function getGroupsAction() {
+    await requireSuperadmin();
+    return await getGroups();
+}
+
+export async function createGroupAction(input: { name: string; description?: string }) {
+    await requireSuperadmin();
+    await createGroup(input);
+    revalidatePath("/admin/user-groups");
+    revalidatePath("/admin/user-privileges");
+}
+
+export async function updateGroupAction(id: string, input: { name: string; description?: string }) {
+    await requireSuperadmin();
+    await updateGroup(id, input);
+    revalidatePath("/admin/user-groups");
+    revalidatePath("/admin/user-privileges");
+}
+
+export async function deleteGroupAction(id: string) {
+    await requireSuperadmin();
+    await deleteGroup(id);
+    revalidatePath("/admin/user-groups");
+    revalidatePath("/admin/user-privileges");
+}
+
+export async function getPrivilegesAction(groupId?: string) {
+    await requireSuperadmin();
+    return await getPrivileges(groupId);
+}
+
+export async function setPrivilegeAction(groupId: string, menuId: string, actions: string[]) {
+    await requireSuperadmin();
+    await setPrivilege(groupId, menuId, actions);
+    revalidatePath("/admin/user-privileges");
+}
+
+export async function getRbacMenusAction() {
+    await requireSuperadmin();
+    return await getRbacMenus();
+}
+
+export async function createMenuAction(input: {
+    label: string;
+    parent_id?: string | null;
+    path?: string | null;
+    icon_name?: string;
+    sort_order?: number;
+    is_active?: boolean;
+}) {
+    await requireSuperadmin();
+    await createMenu(input);
+    revalidatePath("/admin/menus");
+    revalidatePath("/admin/menu-actions");
+}
+
+export async function updateMenuAction(id: string, input: {
+    label: string;
+    parent_id?: string | null;
+    path?: string | null;
+    icon_name?: string;
+    sort_order?: number;
+    is_active?: boolean;
+}) {
+    await requireSuperadmin();
+    await updateMenu(id, input);
+    revalidatePath("/admin/menus");
+    revalidatePath("/admin/menu-actions");
+}
+
+export async function deleteMenuAction(id: string) {
+    await requireSuperadmin();
+    await deleteMenu(id);
+    revalidatePath("/admin/menus");
+    revalidatePath("/admin/menu-actions");
+}
+
+export async function getMenuActionsAction() {
+    await requireSuperadmin();
+    return await getMenuActions();
+}
+
+export async function createMenuActionAction(input: { menu_id: string; code: string; label: string }) {
+    await requireSuperadmin();
+    await createMenuActionService(input.menu_id, input.code, input.label);
+    revalidatePath("/admin/menu-actions");
+}
+
+export async function deleteMenuActionAction(id: string) {
+    await requireSuperadmin();
+    await deleteMenuActionService(id);
+    revalidatePath("/admin/menu-actions");
 }

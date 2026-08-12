@@ -51,7 +51,31 @@ export async function createAccount(data: {
     return rows[0];
 }
 
+/** Insert a user's default "Utama" pocket if they don't have any active pocket yet. */
+export async function ensureDefaultAccount(userId: string, client?: { query: typeof pool.query }): Promise<void> {
+    const db = client ?? pool;
+    await db.query(
+        `INSERT INTO accounts (user_id, name, type, balance)
+         SELECT $1, 'Utama', 'CASH', 0
+         WHERE NOT EXISTS (
+             SELECT 1 FROM accounts
+             WHERE user_id = $1 AND deleted_at IS NULL
+         )`,
+        [userId]
+    );
+}
+
 export async function deleteAccount(id: string, userId: string): Promise<boolean> {
+    // Guard: every user must keep at least one active pocket
+    const active = await pool.query(
+        `SELECT COUNT(*)::int AS count
+         FROM accounts
+         WHERE user_id = $1 AND deleted_at IS NULL`,
+        [userId]
+    );
+    if ((active.rows[0]?.count ?? 0) <= 1) {
+        throw new Error("Tidak bisa menghapus kantong terakhir. Minimal harus ada 1 kantong.");
+    }
     const { rowCount } = await pool.query(
         `UPDATE accounts
          SET deleted_at = NOW()

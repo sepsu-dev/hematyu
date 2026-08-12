@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     const session = await createSession(
-        { userId: user.id, email: user.email, name: user.name, role: user.role ?? "user" },
+        { userId: user.id, email: user.email, name: user.name },
         // "remember" — default tidak dicentang = 7 hari
         false
     );

@@ -6,12 +6,14 @@ export interface MasterCategoryRow {
     id: string;
     name: string;
     type: "INCOME" | "EXPENSE";
+    icon_name?: string;
+    color_hex?: string;
     created_at: string;
 }
 
 export async function getMasterCategories(): Promise<MasterCategoryRow[]> {
     const { rows } = await pool.query(
-        `SELECT id, name, type, created_at
+        `SELECT id, name, type, icon_name, color_hex, created_at
          FROM categories
          WHERE user_id IS NULL
            AND deleted_at IS NULL
@@ -23,12 +25,14 @@ export async function getMasterCategories(): Promise<MasterCategoryRow[]> {
 export async function createMasterCategory(data: {
     name: string;
     type: "INCOME" | "EXPENSE";
+    iconName?: string;
+    colorHex?: string;
 }): Promise<MasterCategoryRow> {
     const { rows } = await pool.query(
-        `INSERT INTO categories (user_id, name, type, is_default)
-         VALUES (NULL, $1, $2, TRUE)
-         RETURNING id, name, type, created_at`,
-        [data.name.trim(), data.type]
+        `INSERT INTO categories (user_id, name, type, is_default, icon_name, color_hex)
+         VALUES (NULL, $1, $2, TRUE, $3, $4)
+         RETURNING id, name, type, icon_name, color_hex, created_at`,
+        [data.name.trim(), data.type, data.iconName || 'circle', data.colorHex || '#71717a']
     );
     return rows[0];
 }

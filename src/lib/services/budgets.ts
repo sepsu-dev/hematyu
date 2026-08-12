@@ -10,7 +10,8 @@ export interface BudgetRow {
     pct: number;
 }
 
-export async function getBudgets(userId: string): Promise<BudgetRow[]> {
+export async function getBudgets(userId: string, month?: string): Promise<BudgetRow[]> {
+    const refMonth = month && /^\d{4}-\d{2}$/.test(month) ? month : new Date().toISOString().slice(0, 7);
     const { rows } = await pool.query(
         `SELECT
            b.id, b.category_id, c.name AS category, b.amount::float AS amount,
@@ -19,8 +20,8 @@ export async function getBudgets(userId: string): Promise<BudgetRow[]> {
              WHERE t.user_id = b.user_id
                AND t.category_id = b.category_id
                AND t.type = 'EXPENSE'
-               AND t.date >= date_trunc('month', NOW())
-               AND t.date < date_trunc('month', NOW()) + INTERVAL '1 month'
+               AND t.date >= date_trunc('month', $2::date)
+               AND t.date < date_trunc('month', $2::date) + INTERVAL '1 month'
            ), 0)::float AS spent
          FROM budgets b
          JOIN categories c ON c.id = b.category_id
@@ -28,7 +29,7 @@ export async function getBudgets(userId: string): Promise<BudgetRow[]> {
            AND b.period = 'MONTHLY'
            AND b.deleted_at IS NULL
          ORDER BY c.name ASC`,
-        [userId]
+        [userId, `${refMonth}-01`]
     );
     return rows.map((r) => ({
         ...r,

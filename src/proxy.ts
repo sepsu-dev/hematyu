@@ -6,7 +6,16 @@ const secret = new TextEncoder().encode(
 );
 const COOKIE_NAME = "hematyu_session";
 
-const PROTECTED_PREFIX = "/dashboard";
+const PROTECTED_PREFIXES = [
+    "/dashboard",
+    "/transactions",
+    "/wallets",
+    "/budgets",
+    "/goals",
+    "/reports",
+    "/settings",
+    "/master",
+];
 const AUTH_PAGES = ["/login", "/register", "/forgot-password"];
 
 export async function proxy(request: NextRequest) {
@@ -23,8 +32,8 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    const isProtected = pathname.startsWith(PROTECTED_PREFIX);
-    const isAuthPage = AUTH_PAGES.some((p) => pathname.startsWith(p));
+    const isProtected = PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+    const isAuthPage = AUTH_PAGES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
     if (isProtected && !valid) {
         const url = request.nextUrl.clone();
@@ -42,5 +51,17 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/login", "/register", "/forgot-password"],
+    matcher: [
+        "/dashboard/:path*",
+        "/transactions/:path*",
+        "/wallets/:path*",
+        "/budgets/:path*",
+        "/goals/:path*",
+        "/reports/:path*",
+        "/settings/:path*",
+        "/master/:path*",
+        "/login",
+        "/register",
+        "/forgot-password",
+    ],
 };

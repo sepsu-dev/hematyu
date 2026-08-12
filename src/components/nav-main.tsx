@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import {
   Collapsible,
   CollapsibleContent,
@@ -22,7 +23,7 @@ export function NavMain({
 }: {
   items: {
     title: string
-    url: string
+    url?: string
     icon?: React.ReactNode
     isActive?: boolean
     items?: {
@@ -31,6 +32,27 @@ export function NavMain({
     }[]
   }[]
 }) {
+  // controlled per-item: admin submenu auto-opens when its route is active,
+  // and stays in sync on navigation (defaultOpen only applies at first mount)
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(items.map((item) => [item.title, item.isActive ?? false]))
+  )
+
+  // open the submenu whose route became active (covers client-side navigation)
+  useEffect(() => {
+    setOpenItems((prev) => {
+      const next = { ...prev }
+      let changed = false
+      for (const item of items) {
+        if (item.items?.length && item.isActive && !next[item.title]) {
+          next[item.title] = true
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
+  }, [items.map((item) => item.isActive).join()]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="font-semibold text-xs text-muted-foreground">Menu</SidebarGroupLabel>
@@ -40,7 +62,8 @@ export function NavMain({
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={item.isActive}
+              open={openItems[item.title] ?? false}
+              onOpenChange={(open) => setOpenItems((prev) => ({ ...prev, [item.title]: open }))}
               className="group/collapsible"
             >
               <SidebarMenuItem className="my-1">
@@ -52,7 +75,7 @@ export function NavMain({
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenuSub>
+                  <SidebarMenuSub className="my-1">
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>

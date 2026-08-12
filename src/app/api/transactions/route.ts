@@ -3,7 +3,7 @@ import { verifySession } from "@/lib/auth/session";
 import { getTransactions, createTransaction } from "@/lib/services/transactions";
 
 const createSchema = z.object({
-    categoryId: z.string().uuid(),
+    categoryId: z.string(),
     type: z.enum(["INCOME", "EXPENSE"]),
     amount: z.number().positive(),
     description: z.string().trim().min(1),

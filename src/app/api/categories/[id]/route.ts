@@ -2,7 +2,7 @@ import { z } from "zod";
 import { verifySession } from "@/lib/auth/session";
 import { deleteCategory } from "@/lib/services/categories";
 
-const paramsSchema = z.object({ id: z.string().uuid() });
+const paramsSchema = z.object({ id: z.string() });
 
 export async function DELETE(
     _request: Request,

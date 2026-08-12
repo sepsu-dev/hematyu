@@ -29,4 +29,5 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // ─── Demo user ID (auth menyusul) ────────────────────────────────
-export const DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
+// User pertama di seed.sql (Jason David, superadmin) → id = 1
+export const DEMO_USER_ID = "1";

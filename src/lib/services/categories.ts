@@ -7,14 +7,21 @@ export interface CategoryRow {
     name: string;
     type: CatType;
     is_default: boolean;
+    icon_name?: string;
+    color_hex?: string;
 }
 
 export async function getCategories(userId: string): Promise<CategoryRow[]> {
     const { rows } = await pool.query(
-        `SELECT id, name, type, is_default
-         FROM categories
-         WHERE user_id = $1
-           AND deleted_at IS NULL
+        `WITH merged AS (
+           SELECT DISTINCT ON (name, type) id, name, type, is_default, icon_name, color_hex
+           FROM categories
+           WHERE (user_id = $1 OR user_id IS NULL)
+             AND deleted_at IS NULL
+           ORDER BY name, type, user_id NULLS LAST
+         )
+         SELECT id, name, type, is_default, icon_name, color_hex
+         FROM merged
          ORDER BY is_default DESC, type, name ASC`,
         [userId]
     );
@@ -25,12 +32,14 @@ export async function createCategory(data: {
     userId: string;
     name: string;
     type: CatType;
+    iconName?: string;
+    colorHex?: string;
 }): Promise<CategoryRow> {
     const { rows } = await pool.query(
-        `INSERT INTO categories (user_id, name, type)
-         VALUES ($1, $2, $3)
-         RETURNING id, name, type, is_default`,
-        [data.userId, data.name.trim(), data.type]
+        `INSERT INTO categories (user_id, name, type, icon_name, color_hex)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, type, is_default, icon_name, color_hex`,
+        [data.userId, data.name.trim(), data.type, data.iconName || 'circle', data.colorHex || '#71717a']
     );
     return rows[0];
 }

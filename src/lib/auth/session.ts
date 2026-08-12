@@ -11,7 +11,6 @@ export interface SessionPayload {
     userId: string;
     email: string;
     name: string;
-    role: string;
 }
 
 export async function createSession(
@@ -38,11 +37,13 @@ export async function verifySession(): Promise<SessionPayload | null> {
         const token = cookieStore.get(COOKIE_NAME)?.value;
         if (!token) return null;
         const { payload } = await jwtVerify(token, secret);
+        const userId = payload.userId as string;
+        // users.id is BIGSERIAL — reject placeholder UUIDs from the pre-auth demo era
+        if (!/^\d+$/.test(userId)) return null;
         return {
-            userId: payload.userId as string,
+            userId,
             email: payload.email as string,
             name: payload.name as string,
-            role: (payload.role as string) ?? "user",
         };
     } catch {
         return null;

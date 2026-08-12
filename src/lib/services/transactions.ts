@@ -136,11 +136,11 @@ export async function getSummary(userId: string) {
 
 export async function getExpenseByCategory(userId: string) {
     const { rows } = await pool.query(
-        `SELECT c.name AS category, SUM(t.amount)::float AS total
+        `SELECT c.name AS category, SUM(t.amount)::float AS total, c.color_hex, c.icon_name
      FROM transactions t
      JOIN categories c ON c.id = t.category_id
      WHERE t.user_id = $1 AND t.type = 'EXPENSE'
-     GROUP BY c.name
+     GROUP BY c.name, c.color_hex, c.icon_name
      ORDER BY total DESC`,
         [userId]
     );
@@ -149,11 +149,11 @@ export async function getExpenseByCategory(userId: string) {
 
 export async function getIncomeByCategory(userId: string) {
     const { rows } = await pool.query(
-        `SELECT c.name AS category, SUM(t.amount)::float AS total
+        `SELECT c.name AS category, SUM(t.amount)::float AS total, c.color_hex, c.icon_name
      FROM transactions t
      JOIN categories c ON c.id = t.category_id
      WHERE t.user_id = $1 AND t.type = 'INCOME'
-     GROUP BY c.name
+     GROUP BY c.name, c.color_hex, c.icon_name
      ORDER BY total DESC`,
         [userId]
     );
