@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
 
         // 5. Generate session payload
         const session = await createSession({
-            userId: user.id,
+            userId: String(user.id),
             email: user.email,
             name: user.name,
         }, true);
