@@ -47,7 +47,11 @@ export async function verifySession(): Promise<SessionPayload | null> {
             email: payload.email as string,
             name: payload.name as string,
         };
-    } catch (err) {
+    } catch (err: any) {
+        // Jangan swallow error internal Next.js (Dynamic Server Usage) agar compiler tahu halaman ini dinamis
+        if (err?.message?.includes("Dynamic server usage") || err?.digest === "DYNAMIC_SERVER_USAGE") {
+            throw err;
+        }
         console.error("verifySession error:", err);
         return null;
     }

@@ -3,6 +3,8 @@ import { verifySession } from "@/lib/auth/session";
 import { getMenusForUser } from "@/lib/services/menus";
 import { DashboardLayoutClient } from "./layout-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
