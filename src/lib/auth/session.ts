@@ -38,14 +38,17 @@ export async function verifySession(): Promise<SessionPayload | null> {
         if (!token) return null;
         const { payload } = await jwtVerify(token, secret);
         const userId = payload.userId as string;
-        // users.id is BIGSERIAL — reject placeholder UUIDs from the pre-auth demo era
-        if (!/^\d+$/.test(userId)) return null;
+        // Support both BigSerial (integers) and UUIDs just in case
+        if (!/^\d+$/.test(userId) && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+            return null;
+        }
         return {
             userId,
             email: payload.email as string,
             name: payload.name as string,
         };
-    } catch {
+    } catch (err) {
+        console.error("verifySession error:", err);
         return null;
     }
 }
