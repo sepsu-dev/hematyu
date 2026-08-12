@@ -89,11 +89,6 @@ export default function AdminLaporanPage() {
       color: "text-[#E35B30]", bg: "bg-orange-50",
       sub: `${stats.thisMonthTransactions} transaksi bulan ini`,
     },
-    {
-      label: "Total Volume", value: formatRp(stats.totalVolume), icon: TrendingUp,
-      color: "text-amber-600", bg: "bg-amber-50",
-      sub: `${formatRp(stats.thisMonthVolume)} bulan ini`,
-    },
   ] : [];
 
   return (
@@ -117,7 +112,7 @@ export default function AdminLaporanPage() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {loading && !stats ? Array.from({ length: 4 }).map((_, i) => (
+        {loading && !stats ? Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="sketch-card bg-white p-5 animate-pulse">
             <div className="h-3 bg-stone-100 rounded w-2/3 mb-3" />
             <div className="h-7 bg-stone-100 rounded w-1/2 mb-2" />
@@ -157,18 +152,15 @@ export default function AdminLaporanPage() {
                 <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Role</th>
                 <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Tgl Daftar</th>
                 <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Transaksi</th>
-                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Total Masuk</th>
-                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Total Keluar</th>
                 <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Transaksi Terakhir</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} className="text-center py-12 text-stone-300 font-bold">Memuat data...</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Memuat data...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={8} className="text-center py-12 text-stone-300 font-bold">Belum ada user</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Belum ada user</td></tr>
               ) : users.map((u, i) => {
-                const net = u.total_income - u.total_expense;
                 const isAdmin = u.group_names.includes("Superadmin");
                 const isActive = u.last_transaction && new Date(u.last_transaction) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
                 return (
@@ -216,8 +208,6 @@ export default function AdminLaporanPage() {
                     <td className="px-5 py-4 text-right">
                       <span className="font-black text-stone-700">{u.total_transactions.toLocaleString("id-ID")}</span>
                     </td>
-                    <td className="px-5 py-4 text-right font-bold text-emerald-600">{formatRp(u.total_income)}</td>
-                    <td className="px-5 py-4 text-right font-bold text-[#E35B30]">{formatRp(u.total_expense)}</td>
                     <td className="px-5 py-4">
                       <span className="text-stone-400 font-bold">{formatDateTime(u.last_transaction)}</span>
                     </td>
@@ -232,12 +222,6 @@ export default function AdminLaporanPage() {
                   <td colSpan={4} className="px-5 py-3 text-xs font-extrabold text-stone-500">Total Platform</td>
                   <td className="px-5 py-3 text-right font-black text-stone-700">
                     {users.reduce((s, u) => s + u.total_transactions, 0).toLocaleString("id-ID")}
-                  </td>
-                  <td className="px-5 py-3 text-right font-black text-emerald-600">
-                    {formatRp(users.reduce((s, u) => s + u.total_income, 0))}
-                  </td>
-                  <td className="px-5 py-3 text-right font-black text-[#E35B30]">
-                    {formatRp(users.reduce((s, u) => s + u.total_expense, 0))}
                   </td>
                   <td />
                 </tr>
