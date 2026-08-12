@@ -9,7 +9,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await verifySession();
-  if (!session) redirect("/login");
+  if (!session) {
+    redirect("/api/auth/clear-session");
+  }
 
   const menus = await getMenusForUser(session.userId);
 
