@@ -37,8 +37,9 @@ export default function SettingsPage() {
   // Categories
   const [categories, setCategories] = useState<Category[]>([]);
   const [catsLoaded, setCatsLoaded] = useState(false);
-  const [newIncome, setNewIncome] = useState("");
-  const [newExpense, setNewExpense] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newType, setNewType] = useState<"INCOME" | "EXPENSE">("EXPENSE");
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     getProfileAction()
@@ -60,9 +61,6 @@ export default function SettingsPage() {
       .catch(() => setCatsLoaded(true));
   }, []);
 
-  const incomeCats = categories.filter((c) => c.type === "INCOME");
-  const expenseCats = categories.filter((c) => c.type === "EXPENSE");
-
   const handleSaveProfile = async () => {
     try {
       await updateProfileAction(profile);
@@ -73,18 +71,22 @@ export default function SettingsPage() {
     }
   };
 
-  const addCat = async (type: "INCOME" | "EXPENSE", name: string) => {
-    const val = name.trim();
+  const addCat = async () => {
+    const val = newName.trim();
     if (!val) return;
-    if (categories.some((c) => c.name.toLowerCase() === val.toLowerCase())) return;
+    if (categories.some((c) => c.name.toLowerCase() === val.toLowerCase() && c.type === newType)) return;
+    setAdding(true);
     try {
-      await createCategoryAction({ name: val, type });
+      await createCategoryAction({ name: val, type: newType });
       const data = await getCategoriesAction();
       setCategories(data);
-      if (type === "INCOME") setNewIncome("");
-      else setNewExpense("");
+      setNewName("");
+      setShowCatToast(true);
+      setTimeout(() => setShowCatToast(false), 2500);
     } catch {
       // ignore
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -103,8 +105,11 @@ export default function SettingsPage() {
     { id: "kategori", label: "Kategori", icon: <Tag className="w-3.5 h-3.5" /> },
   ];
 
+  const incomeCats = categories.filter((c) => c.type === "INCOME");
+  const expenseCats = categories.filter((c) => c.type === "EXPENSE");
+
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 p-6 relative">
       {showSavedToast && (
         <div className="fixed top-20 right-8 bg-emerald-500 text-white px-4 py-3 rounded-lg shadow-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-50">
           <Check className="w-3.5 h-3.5" />
@@ -114,7 +119,7 @@ export default function SettingsPage() {
       {showCatToast && (
         <div className="fixed top-20 right-8 bg-emerald-500 text-white px-4 py-3 rounded-lg shadow-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-50">
           <Check className="w-3.5 h-3.5" />
-          <span>Kategori berhasil disimpan!</span>
+          <span>Kategori berhasil ditambahkan!</span>
         </div>
       )}
 
@@ -176,8 +181,44 @@ export default function SettingsPage() {
       )}
 
       {activeTab === "kategori" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Income Categories */}
+        <div className="space-y-6">
+          {/* Add Form */}
+          <div className="sketch-card bg-white overflow-hidden">
+            <div className="p-5 border-b border-[#E7DED4] flex items-center gap-2">
+              <Plus className="w-4 h-4 text-primary" />
+              <h2 className="text-sm font-extrabold text-stone-900">Tambah Kategori</h2>
+            </div>
+            <div className="p-5">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  placeholder="Nama kategori baru..."
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addCat()}
+                  className="flex-1 px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold placeholder:text-stone-300"
+                />
+                <select
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value as "INCOME" | "EXPENSE")}
+                  className="px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold"
+                >
+                  <option value="INCOME">Uang Masuk</option>
+                  <option value="EXPENSE">Uang Keluar</option>
+                </select>
+                <button
+                  onClick={addCat}
+                  disabled={adding || !newName.trim()}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold transition-all disabled:opacity-50"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Tambah
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Kategori Masuk Table */}
           <div className="sketch-card bg-white overflow-hidden">
             <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -190,46 +231,66 @@ export default function SettingsPage() {
                 {catsLoaded ? incomeCats.length : "..."} kategori
               </span>
             </div>
-            <div className="p-5 space-y-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Tambah kategori baru..."
-                  value={newIncome}
-                  onChange={(e) => setNewIncome(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addCat("INCOME", newIncome)}
-                  className="flex-1 px-3 py-2 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 text-stone-900 text-xs font-bold placeholder:text-stone-300"
-                />
-                <button onClick={() => addCat("INCOME", newIncome)}
-                  className="px-3 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5">
-                  <Plus className="w-3.5 h-3.5" />
-                  Tambah
-                </button>
-              </div>
-              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-                {catsLoaded ? incomeCats.map((cat) => (
-                  <div key={cat.id}
-                    className="flex items-center justify-between px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg group hover:border-emerald-200 transition-all">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                      <span className="text-xs font-bold text-stone-700">{cat.name}</span>
-                      {cat.is_default && (
-                        <span className="text-[8px] font-black bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded-full">default</span>
-                      )}
-                    </div>
-                    <button onClick={() => removeCat(cat.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 transition-all">
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                )) : (
-                  <p className="text-xs text-stone-300 text-center py-6">Memuat...</p>
-                )}
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-[#FAF6F0] border-b border-[#E7DED4]">
+                    <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">No</th>
+                    <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Nama Kategori</th>
+                    <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Tipe</th>
+                    <th className="text-center px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Default</th>
+                    <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {!catsLoaded ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-8 text-stone-300 font-bold">Memuat...</td>
+                    </tr>
+                  ) : incomeCats.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-8 text-stone-300 font-bold">Belum ada kategori uang masuk</td>
+                    </tr>
+                  ) : incomeCats.map((cat, i) => (
+                    <tr key={cat.id} className="border-b border-[#E7DED4] last:border-0 hover:bg-[#FAF6F0] transition-colors group">
+                      <td className="px-5 py-3.5 text-stone-400 font-bold">{i + 1}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                          <span className="font-bold text-stone-700">{cat.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700">
+                          Masuk
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        {cat.is_default ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-stone-100 text-stone-500">default</span>
+                        ) : (
+                          <span className="text-stone-200 text-[10px]">—</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {!cat.is_default && (
+                          <button
+                            onClick={() => removeCat(cat.id)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold">Hapus</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
-          {/* Expense Categories */}
+          {/* Kategori Keluar Table */}
           <div className="sketch-card bg-white overflow-hidden">
             <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -242,51 +303,63 @@ export default function SettingsPage() {
                 {catsLoaded ? expenseCats.length : "..."} kategori
               </span>
             </div>
-            <div className="p-5 space-y-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Tambah kategori baru..."
-                  value={newExpense}
-                  onChange={(e) => setNewExpense(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addCat("EXPENSE", newExpense)}
-                  className="flex-1 px-3 py-2 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#E35B30] text-stone-900 text-xs font-bold placeholder:text-stone-300"
-                />
-                <button onClick={() => addCat("EXPENSE", newExpense)}
-                  className="px-3 py-2 bg-[#E35B30] text-white hover:bg-[#c94d27] rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5">
-                  <Plus className="w-3.5 h-3.5" />
-                  Tambah
-                </button>
-              </div>
-              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-                {catsLoaded ? expenseCats.map((cat) => (
-                  <div key={cat.id}
-                    className="flex items-center justify-between px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg group hover:border-orange-200 transition-all">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#E35B30] shrink-0" />
-                      <span className="text-xs font-bold text-stone-700">{cat.name}</span>
-                      {cat.is_default && (
-                        <span className="text-[8px] font-black bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded-full">default</span>
-                      )}
-                    </div>
-                    <button onClick={() => removeCat(cat.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 transition-all">
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                )) : (
-                  <p className="text-xs text-stone-300 text-center py-6">Memuat...</p>
-                )}
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-[#FAF6F0] border-b border-[#E7DED4]">
+                    <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">No</th>
+                    <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Nama Kategori</th>
+                    <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Tipe</th>
+                    <th className="text-center px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Default</th>
+                    <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {!catsLoaded ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-8 text-stone-300 font-bold">Memuat...</td>
+                    </tr>
+                  ) : expenseCats.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-8 text-stone-300 font-bold">Belum ada kategori uang keluar</td>
+                    </tr>
+                  ) : expenseCats.map((cat, i) => (
+                    <tr key={cat.id} className="border-b border-[#E7DED4] last:border-0 hover:bg-[#FAF6F0] transition-colors group">
+                      <td className="px-5 py-3.5 text-stone-400 font-bold">{i + 1}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#E35B30] shrink-0" />
+                          <span className="font-bold text-stone-700">{cat.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-orange-50 text-[#E35B30]">
+                          Keluar
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        {cat.is_default ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-stone-100 text-stone-500">default</span>
+                        ) : (
+                          <span className="text-stone-200 text-[10px]">—</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {!cat.is_default && (
+                          <button
+                            onClick={() => removeCat(cat.id)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold">Hapus</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
-
-          <div className="md:col-span-2 flex justify-end">
-            <button onClick={() => { setShowCatToast(true); setTimeout(() => setShowCatToast(false), 2500); }}
-              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white hover:bg-primary/90 transition-all rounded-lg shadow-sm text-xs font-extrabold">
-              <Save className="w-3.5 h-3.5" />
-              Kategori Tersimpan Otomatis
-            </button>
           </div>
         </div>
       )}

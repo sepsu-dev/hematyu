@@ -45,10 +45,12 @@ CREATE TABLE categories (
   is_default BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ NULL DEFAULT NULL,
   UNIQUE (user_id, name, type)
 );
 
 CREATE INDEX idx_categories_user_type ON categories(user_id, type);
+CREATE INDEX idx_categories_deleted_at ON categories(deleted_at) WHERE deleted_at IS NULL;
 
 -- ─── Accounts ────────────────────────────────────────────────────
 CREATE TABLE accounts (
@@ -58,10 +60,12 @@ CREATE TABLE accounts (
   type       account_type NOT NULL DEFAULT 'CASH',
   balance    NUMERIC(15, 2) NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ NULL DEFAULT NULL
 );
 
 CREATE INDEX idx_accounts_user ON accounts(user_id);
+CREATE INDEX idx_accounts_deleted_at ON accounts(deleted_at) WHERE deleted_at IS NULL;
 
 -- ─── Transactions ────────────────────────────────────────────────
 CREATE TABLE transactions (
@@ -101,11 +105,13 @@ CREATE TABLE budgets (
   period      budget_period NOT NULL DEFAULT 'MONTHLY',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at  TIMESTAMPTZ NULL DEFAULT NULL,
   UNIQUE (user_id, category_id, period)
 );
 
 CREATE INDEX idx_budgets_user ON budgets(user_id);
 CREATE INDEX idx_budgets_user_period ON budgets(user_id, period);
+CREATE INDEX idx_budgets_deleted_at ON budgets(deleted_at) WHERE deleted_at IS NULL;
 
 -- ─── Goals (Coming Soon) ─────────────────────────────────────────
 CREATE TABLE goals (
@@ -116,10 +122,12 @@ CREATE TABLE goals (
   current_amount NUMERIC(15, 2) NOT NULL DEFAULT 0,
   deadline       TIMESTAMPTZ,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at     TIMESTAMPTZ NULL DEFAULT NULL
 );
 
 CREATE INDEX idx_goals_user ON goals(user_id);
+CREATE INDEX idx_goals_deleted_at ON goals(deleted_at) WHERE deleted_at IS NULL;
 
 -- ─── Trigger: auto-update updated_at ─────────────────────────────
 CREATE OR REPLACE FUNCTION set_updated_at()

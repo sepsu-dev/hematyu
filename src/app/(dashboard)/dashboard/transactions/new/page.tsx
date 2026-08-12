@@ -35,7 +35,7 @@ interface Category {
 interface Account {
   id: string;
   name: string;
-  type: "BANK" | "E_WALLET" | "CASH";
+  type: string; // dynamic from master_account_types
 }
 
 function formatRp(n: number) {
@@ -120,7 +120,7 @@ export default function NewTransactionPage() {
   const numericAmount = parseInt(amount || "0", 10);
 
   return (
-    <div className="space-y-6 max-w-xl">
+    <div className="space-y-6 p-6 max-w-xl">
 
       {/* ─── Back nav ─── */}
       <div className="flex items-center gap-3">

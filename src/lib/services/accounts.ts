@@ -1,6 +1,8 @@
 import { pool } from "@/lib/db";
+import { getMasterAccountTypes, type MasterAccountTypeRow } from "./master";
 
-export type AccountType = "BANK" | "E_WALLET" | "CASH";
+export type AccountType = string; // dynamic from master_account_types
+export type { MasterAccountTypeRow as AccountTypeRow };
 
 export interface AccountRow {
     id: string;
@@ -8,6 +10,11 @@ export interface AccountRow {
     type: AccountType;
     balance: number;
     current_balance: number;
+}
+
+/** Fetch all active account types from master table (for dropdowns) */
+export async function getAccountTypes(): Promise<MasterAccountTypeRow[]> {
+    return getMasterAccountTypes();
 }
 
 export async function getAccounts(userId: string): Promise<AccountRow[]> {
@@ -21,6 +28,7 @@ export async function getAccounts(userId: string): Promise<AccountRow[]> {
          FROM accounts a
          LEFT JOIN transactions t ON t.account_id = a.id
          WHERE a.user_id = $1
+           AND a.deleted_at IS NULL
          GROUP BY a.id, a.name, a.type, a.balance
          ORDER BY a.created_at ASC`,
         [userId]
@@ -45,7 +53,9 @@ export async function createAccount(data: {
 
 export async function deleteAccount(id: string, userId: string): Promise<boolean> {
     const { rowCount } = await pool.query(
-        `DELETE FROM accounts WHERE id = $1 AND user_id = $2`,
+        `UPDATE accounts
+         SET deleted_at = NOW()
+         WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
         [id, userId]
     );
     return (rowCount ?? 0) > 0;

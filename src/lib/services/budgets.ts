@@ -24,7 +24,9 @@ export async function getBudgets(userId: string): Promise<BudgetRow[]> {
            ), 0)::float AS spent
          FROM budgets b
          JOIN categories c ON c.id = b.category_id
-         WHERE b.user_id = $1 AND b.period = 'MONTHLY'
+         WHERE b.user_id = $1
+           AND b.period = 'MONTHLY'
+           AND b.deleted_at IS NULL
          ORDER BY c.name ASC`,
         [userId]
     );
@@ -45,7 +47,7 @@ export async function createBudget(data: {
         `INSERT INTO budgets (user_id, category_id, amount, period)
          VALUES ($1, $2, $3, $4)
          ON CONFLICT (user_id, category_id, period)
-         DO UPDATE SET amount = EXCLUDED.amount
+         DO UPDATE SET amount = EXCLUDED.amount, deleted_at = NULL
          RETURNING id, category_id, amount::float AS amount`,
         [data.userId, data.categoryId, data.amount, data.period ?? "MONTHLY"]
     );
@@ -55,7 +57,9 @@ export async function createBudget(data: {
 
 export async function deleteBudget(id: string, userId: string): Promise<boolean> {
     const { rowCount } = await pool.query(
-        `DELETE FROM budgets WHERE id = $1 AND user_id = $2`,
+        `UPDATE budgets
+         SET deleted_at = NOW()
+         WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
         [id, userId]
     );
     return (rowCount ?? 0) > 0;

@@ -16,7 +16,7 @@ export async function loginAction(formData: FormData) {
     }
 
     const session = await createSession(
-        { userId: user.id, email: user.email, name: user.name },
+        { userId: user.id, email: user.email, name: user.name, role: user.role ?? "user" },
         remember
     );
     const cookieStore = await cookies();
@@ -45,7 +45,7 @@ export async function registerAction(formData: FormData) {
 
     try {
         const user = await registerUser({ name, email, password });
-        const session = await createSession({ userId: user.id, email: user.email, name: user.name });
+        const session = await createSession({ userId: user.id, email: user.email, name: user.name, role: user.role ?? "user" });
         const cookieStore = await cookies();
         cookieStore.set(session.name, session.value, {
             httpOnly: true,

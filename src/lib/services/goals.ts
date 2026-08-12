@@ -16,6 +16,7 @@ export async function getGoals(userId: string): Promise<GoalRow[]> {
                 current_amount::float AS current_amount, deadline
          FROM goals
          WHERE user_id = $1
+           AND deleted_at IS NULL
          ORDER BY
            CASE WHEN current_amount >= target_amount THEN 1 ELSE 0 END ASC,
            target_amount - current_amount ASC`,
@@ -50,6 +51,7 @@ export async function updateGoalAmount(id: string, userId: string, amount: numbe
         `UPDATE goals
          SET current_amount = current_amount + $3
          WHERE id = $1 AND user_id = $2
+           AND deleted_at IS NULL
            AND current_amount + $3 >= 0`,
         [id, userId, amount]
     );
@@ -58,7 +60,9 @@ export async function updateGoalAmount(id: string, userId: string, amount: numbe
 
 export async function deleteGoal(id: string, userId: string): Promise<boolean> {
     const { rowCount } = await pool.query(
-        `DELETE FROM goals WHERE id = $1 AND user_id = $2`,
+        `UPDATE goals
+         SET deleted_at = NOW()
+         WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
         [id, userId]
     );
     return (rowCount ?? 0) > 0;

@@ -5,6 +5,7 @@ import {
   Landmark,
   Smartphone,
   Wallet,
+  CreditCard,
   Plus,
   Trash2,
   Loader2,
@@ -13,9 +14,18 @@ import {
   getAccountsAction,
   createAccountAction,
   deleteAccountAction,
+  getAccountTypesAction,
 } from "@/app/dashboard/actions";
 
-type AccountType = "BANK" | "E_WALLET" | "CASH";
+interface AccountTypeInfo {
+  id: string;
+  code: string;
+  label: string;
+  icon_name: string;
+  color: string;
+}
+
+type AccountType = string;
 
 interface Account {
   id: string;
@@ -25,11 +35,27 @@ interface Account {
   current_balance: number;
 }
 
-const TYPE_META: Record<AccountType, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
-  BANK: { label: "Bank", icon: <Landmark className="w-4 h-4" />, color: "text-primary", bg: "bg-primary/10" },
-  E_WALLET: { label: "E-Wallet", icon: <Smartphone className="w-4 h-4" />, color: "text-emerald-600", bg: "bg-emerald-50" },
-  CASH: { label: "Tunai", icon: <Wallet className="w-4 h-4" />, color: "text-[#E35B30]", bg: "bg-orange-50" },
+function TypeIcon({ icon_name, className }: { icon_name: string; className?: string }) {
+  switch (icon_name) {
+    case "landmark": return <Landmark className={className ?? "w-4 h-4"} />;
+    case "smartphone": return <Smartphone className={className ?? "w-4 h-4"} />;
+    case "credit-card": return <CreditCard className={className ?? "w-4 h-4"} />;
+    default: return <Wallet className={className ?? "w-4 h-4"} />;
+  }
+}
+
+const COLOR_CLASS: Record<string, { text: string; bg: string; badge: string }> = {
+  primary: { text: "text-primary", bg: "bg-primary/10", badge: "bg-primary/10 text-primary" },
+  emerald: { text: "text-emerald-600", bg: "bg-emerald-50", badge: "bg-emerald-50 text-emerald-700" },
+  orange: { text: "text-[#E35B30]", bg: "bg-orange-50", badge: "bg-orange-50 text-[#E35B30]" },
+  purple: { text: "text-purple-600", bg: "bg-purple-50", badge: "bg-purple-50 text-purple-700" },
+  amber: { text: "text-amber-600", bg: "bg-amber-50", badge: "bg-amber-50 text-amber-700" },
+  stone: { text: "text-stone-600", bg: "bg-stone-100", badge: "bg-stone-100 text-stone-600" },
 };
+
+function getColor(color: string) {
+  return COLOR_CLASS[color] ?? COLOR_CLASS.stone;
+}
 
 function formatRp(n: number) {
   return "Rp " + n.toLocaleString("id-ID");
@@ -37,10 +63,11 @@ function formatRp(n: number) {
 
 export default function AccountsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountTypes, setAccountTypes] = useState<AccountTypeInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
-  const [type, setType] = useState<AccountType>("BANK");
+  const [type, setType] = useState<AccountType>("");
   const [balance, setBalance] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -52,7 +79,13 @@ export default function AccountsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    getAccountTypesAction().then((types) => {
+      setAccountTypes(types);
+      if (types.length > 0) setType(types[0].code);
+    }).catch(() => { });
+  }, []);
 
   const totalBalance = accounts.reduce((s, a) => s + a.current_balance, 0);
 
@@ -83,11 +116,11 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Kantong</h1>
-          <p className="text-xs text-stone-500 mt-0.5">Kelola kantong Anda.</p>
+          <p className="text-xs text-stone-500 mt-0.5">Kelola kantong keuangan Anda.</p>
         </div>
         <button onClick={() => setShowForm((v) => !v)}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white hover:bg-primary/90 transition-all rounded-lg shadow-sm text-xs font-extrabold">
@@ -123,11 +156,11 @@ export default function AccountsPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Tipe Kantong</label>
-              <select value={type} onChange={(e) => setType(e.target.value as AccountType)}
+              <select value={type} onChange={(e) => setType(e.target.value)}
                 className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold">
-                <option value="BANK">Bank</option>
-                <option value="E_WALLET">E-Wallet</option>
-                <option value="CASH">Tunai</option>
+                {accountTypes.map((t) => (
+                  <option key={t.code} value={t.code}>{t.label}</option>
+                ))}
               </select>
             </div>
             <div className="space-y-1.5">
@@ -152,39 +185,81 @@ export default function AccountsPage() {
         </form>
       )}
 
-      {/* Account List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {loading ? (
-          <p className="text-sm font-bold text-stone-300 col-span-full text-center py-12">Memuat...</p>
-        ) : accounts.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-stone-300">
-            <p className="text-sm font-bold">Belum ada kantong</p>
-            <p className="text-xs mt-1">Klik "Tambah Kantong" untuk mulai.</p>
-          </div>
-        ) : accounts.map((acc) => {
-          const meta = TYPE_META[acc.type];
-          return (
-            <div key={acc.id} className="sketch-card bg-white p-5 space-y-4 group">
-              <div className="flex items-start justify-between">
-                <div className={`w-10 h-10 rounded-xl ${meta.bg} flex items-center justify-center`}>
-                  {meta.icon}
-                </div>
-                <button onClick={() => handleDelete(acc.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 transition-all">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <div>
-                <p className="text-sm font-extrabold text-stone-900">{acc.name}</p>
-                <p className={`text-[10px] font-black uppercase tracking-widest mt-0.5 ${meta.color}`}>{meta.label}</p>
-              </div>
-              <div className="pt-2 border-t border-[#E7DED4]">
-                <p className="text-[10px] text-stone-400 font-bold">Saldo Saat Ini</p>
-                <p className="text-lg font-black text-stone-900 mt-0.5">{formatRp(acc.current_balance)}</p>
-              </div>
-            </div>
-          );
-        })}
+      {/* Table */}
+      <div className="sketch-card bg-white overflow-hidden">
+        <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
+          <h2 className="text-sm font-extrabold text-stone-900">Daftar Kantong</h2>
+          <span className="text-[10px] font-black text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
+            {accounts.length} kantong
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-[#FAF6F0] border-b border-[#E7DED4]">
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">No</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Nama</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Tipe</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Saldo Awal</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Saldo Saat Ini</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Memuat...</td>
+                </tr>
+              ) : accounts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-stone-300">
+                    <p className="font-bold text-sm">Belum ada kantong</p>
+                    <p className="text-xs mt-1">Klik &quot;Tambah Kantong&quot; untuk mulai.</p>
+                  </td>
+                </tr>
+              ) : accounts.map((acc, i) => {
+                const typeInfo = accountTypes.find((t) => t.code === acc.type);
+                const colors = getColor(typeInfo?.color ?? "stone");
+                const isPositive = acc.current_balance >= 0;
+                return (
+                  <tr key={acc.id} className="border-b border-[#E7DED4] last:border-0 hover:bg-[#FAF6F0] transition-colors group">
+                    <td className="px-5 py-3.5 text-stone-400 font-bold">{i + 1}</td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-7 h-7 rounded-lg ${colors.bg} flex items-center justify-center shrink-0 ${colors.text}`}>
+                          <TypeIcon icon_name={typeInfo?.icon_name ?? "wallet"} />
+                        </div>
+                        <span className="font-bold text-stone-700">{acc.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black ${colors.badge}`}>
+                        {typeInfo?.label ?? acc.type}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-bold text-stone-500">
+                      {formatRp(acc.balance)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <span className={`font-black ${isPositive ? "text-stone-900" : "text-red-500"}`}>
+                        {formatRp(acc.current_balance)}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <button
+                        onClick={() => handleDelete(acc.id)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-bold">Hapus</span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

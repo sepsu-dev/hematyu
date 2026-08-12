@@ -37,10 +37,27 @@ import {
 } from "@/lib/services/goals";
 import { updateProfile, getProfile } from "@/lib/services/profile";
 import { getCategories } from "@/lib/services/categories";
+import { getAccountTypes } from "@/lib/services/accounts";
+import {
+    getMasterCategories,
+    createMasterCategory,
+    deleteMasterCategory,
+    getMasterAccountTypes,
+    createMasterAccountType,
+    deleteMasterAccountType,
+} from "@/lib/services/master";
+import { getAdminStats, getAdminUserList } from "@/lib/services/admin";
 
 async function requireUser() {
     const session = await verifySession();
     if (!session) redirect("/login");
+    return session;
+}
+
+async function requireSuperadmin() {
+    const session = await verifySession();
+    if (!session) redirect("/login");
+    if (session.role !== "superadmin") redirect("/dashboard");
     return session;
 }
 
@@ -158,7 +175,7 @@ export async function getAccountsAction() {
 
 export async function createAccountAction(input: {
     name: string;
-    type: "BANK" | "E_WALLET" | "CASH";
+    type: string;
     balance?: number;
 }) {
     const session = await requireUser();
@@ -232,4 +249,67 @@ export async function deleteGoalAction(id: string) {
     const session = await requireUser();
     await deleteGoal(id, session.userId);
     revalidatePath("/dashboard/goals");
+}
+
+// ─── Account Types (Dynamic) ──────────────────────────────────────────────────
+
+export async function getAccountTypesAction() {
+    await requireUser();
+    return await getAccountTypes();
+}
+
+// ─── Master — Categories ──────────────────────────────────────────────────────
+
+export async function getMasterCategoriesAction() {
+    await requireSuperadmin();
+    return await getMasterCategories();
+}
+
+export async function createMasterCategoryAction(input: { name: string; type: "INCOME" | "EXPENSE" }) {
+    await requireSuperadmin();
+    await createMasterCategory({ name: input.name, type: input.type });
+    revalidatePath("/dashboard/master/categories");
+}
+
+export async function deleteMasterCategoryAction(id: string) {
+    await requireSuperadmin();
+    await deleteMasterCategory(id);
+    revalidatePath("/dashboard/master/categories");
+}
+
+// ─── Master — Account Types ───────────────────────────────────────────────────
+
+export async function getMasterAccountTypesAction() {
+    await requireSuperadmin();
+    return await getMasterAccountTypes();
+}
+
+export async function createMasterAccountTypeAction(input: {
+    code: string;
+    label: string;
+    icon_name?: string;
+    color?: string;
+}) {
+    await requireSuperadmin();
+    await createMasterAccountType(input);
+    revalidatePath("/dashboard/master/account-types");
+    revalidatePath("/dashboard/wallets");
+}
+
+export async function deleteMasterAccountTypeAction(id: string) {
+    await requireSuperadmin();
+    await deleteMasterAccountType(id);
+    revalidatePath("/dashboard/master/account-types");
+}
+
+// ─── Admin — Stats & User List ────────────────────────────────────────────────
+
+export async function getAdminStatsAction() {
+    await requireSuperadmin();
+    return await getAdminStats();
+}
+
+export async function getAdminUserListAction() {
+    await requireSuperadmin();
+    return await getAdminUserList();
 }

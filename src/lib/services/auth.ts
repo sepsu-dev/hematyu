@@ -6,6 +6,7 @@ export interface AuthUser {
     name: string;
     email: string;
     phone: string | null;
+    role: string;
 }
 
 export async function getUserByEmail(email: string): Promise<AuthUser | null> {
@@ -18,7 +19,7 @@ export async function getUserByEmail(email: string): Promise<AuthUser | null> {
 
 export async function getUserWithPassword(email: string) {
     const { rows } = await pool.query(
-        `SELECT id, name, email, phone, password_hash FROM users WHERE email = $1`,
+        `SELECT id, name, email, phone, password_hash, role FROM users WHERE email = $1`,
         [email.toLowerCase()]
     );
     return rows[0] ?? null;
@@ -68,5 +69,5 @@ export async function loginWithPassword(email: string, password: string): Promis
     if (!user || !user.password_hash) return null;
     const ok = await verifyPassword(password, user.password_hash);
     if (!ok) return null;
-    return { id: user.id, name: user.name, email: user.email, phone: user.phone };
+    return { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role ?? "user" };
 }

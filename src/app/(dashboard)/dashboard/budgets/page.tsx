@@ -93,7 +93,7 @@ export default function BudgetsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Anggaran</h1>
@@ -106,7 +106,7 @@ export default function BudgetsPage() {
         </button>
       </div>
 
-      {/* Summary */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="sketch-card bg-white p-5">
           <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Total Budget</p>
@@ -164,68 +164,94 @@ export default function BudgetsPage() {
         </form>
       )}
 
-      {/* Budget List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {loading ? (
-          <p className="text-sm font-bold text-stone-300 col-span-full text-center py-12">Memuat...</p>
-        ) : budgets.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-stone-300">
-            <p className="text-sm font-bold">Belum ada budget</p>
-            <p className="text-xs mt-1">Klik "Tambah Budget" untuk mulai mengatur anggaran.</p>
-          </div>
-        ) : budgets.map((b) => {
-          const pct = Math.min(b.pct, 100);
-          const over = b.spent > b.amount;
-          const warning = !over && b.pct >= 80;
-          return (
-            <div key={b.id} className="sketch-card bg-white p-5 space-y-4 group">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${over ? "bg-red-50" : warning ? "bg-yellow-50" : "bg-emerald-50"}`}>
-                    <PiggyBank className={`w-5 h-5 ${over ? "text-red-500" : warning ? "text-yellow-600" : "text-emerald-600"}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-extrabold text-stone-900">{b.category}</p>
-                    <p className="text-[10px] text-stone-400 font-bold">Budget {formatRp(b.amount)}</p>
-                  </div>
-                </div>
-                <button onClick={() => handleDelete(b.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 transition-all">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold text-stone-500">Terpakai {formatRp(b.spent)}</span>
-                  <span className={`text-[11px] font-black ${over ? "text-red-500" : warning ? "text-yellow-600" : "text-emerald-600"}`}>
-                    {b.pct.toFixed(0)}%
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-2 rounded-full transition-all duration-500 ${over ? "bg-red-500" : warning ? "bg-yellow-400" : "bg-emerald-400"}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-1">
-                {over ? (
-                  <span className="flex items-center gap-1.5 text-[10px] font-extrabold text-red-500">
-                    <AlertTriangle className="w-3 h-3" />
-                    Melebihi budget {formatRp(b.spent - b.amount)}
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5 text-[10px] font-extrabold text-emerald-600">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Sisa {formatRp(b.remaining)}
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
+      {/* Table */}
+      <div className="sketch-card bg-white overflow-hidden">
+        <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
+          <h2 className="text-sm font-extrabold text-stone-900">Daftar Anggaran</h2>
+          <span className="text-[10px] font-black text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
+            {budgets.length} budget
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-[#FAF6F0] border-b border-[#E7DED4]">
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">No</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Kategori</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Budget</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Terpakai</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Sisa</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px] w-32">Progress</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-stone-300 font-bold">Memuat...</td>
+                </tr>
+              ) : budgets.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-stone-300">
+                    <p className="font-bold text-sm">Belum ada budget</p>
+                    <p className="text-xs mt-1">Klik &quot;Tambah Budget&quot; untuk mulai mengatur anggaran.</p>
+                  </td>
+                </tr>
+              ) : budgets.map((b, i) => {
+                const pct = Math.min(b.pct, 100);
+                const over = b.spent > b.amount;
+                const warning = !over && b.pct >= 80;
+                return (
+                  <tr key={b.id} className="border-b border-[#E7DED4] last:border-0 hover:bg-[#FAF6F0] transition-colors group">
+                    <td className="px-5 py-4 text-stone-400 font-bold">{i + 1}</td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${over ? "bg-red-50" : warning ? "bg-yellow-50" : "bg-emerald-50"}`}>
+                          <PiggyBank className={`w-4 h-4 ${over ? "text-red-500" : warning ? "text-yellow-600" : "text-emerald-600"}`} />
+                        </div>
+                        <span className="font-bold text-stone-700">{b.category}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right font-bold text-stone-600">{formatRp(b.amount)}</td>
+                    <td className="px-5 py-4 text-right">
+                      <span className={`font-bold ${over ? "text-red-500" : "text-stone-600"}`}>{formatRp(b.spent)}</span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <span className={`font-black ${over ? "text-red-500" : "text-emerald-600"}`}>
+                        {over
+                          ? <span className="flex items-center gap-1 justify-end"><AlertTriangle className="w-3 h-3" /> -{formatRp(b.spent - b.amount)}</span>
+                          : formatRp(b.remaining)
+                        }
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-1.5 rounded-full transition-all duration-500 ${over ? "bg-red-400" : warning ? "bg-yellow-400" : "bg-emerald-400"}`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className={`text-[10px] font-black w-8 text-right ${over ? "text-red-500" : warning ? "text-yellow-600" : "text-emerald-600"}`}>
+                          {b.pct.toFixed(0)}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <button
+                        onClick={() => handleDelete(b.id)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-bold">Hapus</span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export default async function DashboardLayout({
 
   return (
     <DashboardLayoutClient
-      user={{ id: session.userId, name: session.name, email: session.email, phone: null }}
+      user={{ id: session.userId, name: session.name, email: session.email, phone: null, role: session.role ?? "user" }}
     >
       {children}
     </DashboardLayoutClient>

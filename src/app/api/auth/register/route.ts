@@ -33,6 +33,7 @@ export async function POST(request: Request) {
         userId: user.id,
         email: user.email,
         name: user.name,
+        role: user.role ?? "user",
     });
     const cookieStore = await cookies();
     cookieStore.set(session.name, session.value, {

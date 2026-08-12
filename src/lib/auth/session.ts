@@ -11,6 +11,7 @@ export interface SessionPayload {
     userId: string;
     email: string;
     name: string;
+    role: string;
 }
 
 export async function createSession(
@@ -41,6 +42,7 @@ export async function verifySession(): Promise<SessionPayload | null> {
             userId: payload.userId as string,
             email: payload.email as string,
             name: payload.name as string,
+            role: (payload.role as string) ?? "user",
         };
     } catch {
         return null;

@@ -8,6 +8,7 @@ import {
   Loader2,
   Calendar,
   CheckCircle2,
+  PlusCircle,
 } from "lucide-react";
 import {
   getGoalsAction,
@@ -31,7 +32,7 @@ function formatRp(n: number) {
 }
 
 function formatDate(d: string | Date | null) {
-  if (!d) return "Tanpa deadline";
+  if (!d) return "—";
   return new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 }
 
@@ -96,8 +97,12 @@ export default function GoalsPage() {
     load();
   };
 
+  const totalTarget = goals.reduce((s, g) => s + g.target_amount, 0);
+  const totalTerkumpul = goals.reduce((s, g) => s + g.current_amount, 0);
+  const done = goals.filter((g) => g.current_amount >= g.target_amount).length;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Target</h1>
@@ -108,6 +113,22 @@ export default function GoalsPage() {
           <Plus className="w-3.5 h-3.5" />
           Tambah Target
         </button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="sketch-card bg-white p-5">
+          <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Total Target</p>
+          <p className="text-2xl font-black text-stone-900 tracking-tight mt-1">{loading ? "..." : formatRp(totalTarget)}</p>
+        </div>
+        <div className="sketch-card bg-white p-5">
+          <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Terkumpul</p>
+          <p className="text-2xl font-black text-primary tracking-tight mt-1">{loading ? "..." : formatRp(totalTerkumpul)}</p>
+        </div>
+        <div className="sketch-card bg-white p-5">
+          <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Tercapai</p>
+          <p className="text-2xl font-black text-emerald-600 tracking-tight mt-1">{loading ? "..." : `${done} / ${goals.length}`}</p>
+        </div>
       </div>
 
       {/* Add Form */}
@@ -148,103 +169,137 @@ export default function GoalsPage() {
         </form>
       )}
 
-      {/* Goals List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {loading ? (
-          <p className="text-sm font-bold text-stone-300 col-span-full text-center py-12">Memuat...</p>
-        ) : goals.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-stone-300">
-            <p className="text-sm font-bold">Belum ada target</p>
-            <p className="text-xs mt-1">Klik "Tambah Target" untuk mulai menabung.</p>
-          </div>
-        ) : goals.map((g) => {
-          const done = g.current_amount >= g.target_amount;
-          const pct = Math.min(g.pct, 100);
-          return (
-            <div key={g.id} className="sketch-card bg-white p-5 space-y-4 group">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${done ? "bg-emerald-50" : "bg-primary/10"}`}>
-                    {done
-                      ? <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                      : <Target className="w-5 h-5 text-primary" />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-extrabold text-stone-900">{g.name}</p>
-                    <p className="text-[10px] text-stone-400 font-bold flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDate(g.deadline)}
-                    </p>
-                  </div>
-                </div>
-                <button onClick={() => handleDelete(g.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-red-50 text-stone-300 hover:text-red-400 transition-all">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold text-stone-500">
-                    {formatRp(g.current_amount)} <span className="text-stone-300">/ {formatRp(g.target_amount)}</span>
-                  </span>
-                  <span className={`text-[11px] font-black ${done ? "text-emerald-600" : "text-primary"}`}>{g.pct.toFixed(0)}%</span>
-                </div>
-                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-2 rounded-full transition-all duration-500 ${done ? "bg-emerald-400" : "bg-primary"}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-1">
-                {done ? (
-                  <span className="flex items-center gap-1.5 text-[10px] font-extrabold text-emerald-600">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Target tercapai! 🎉
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold text-stone-400">
-                    Kurang {formatRp(g.remaining)} lagi
-                  </span>
-                )}
-              </div>
-
-              {!done && (
-                <div className="pt-2 border-t border-[#E7DED4]">
-                  {topUpId === g.id ? (
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        min={1}
-                        autoFocus
-                        placeholder="Jumlah (Rp)"
-                        value={topUpAmount}
-                        onChange={(e) => setTopUpAmount(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleTopUp(g.id)}
-                        className="flex-1 px-3 py-2 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold placeholder:text-stone-300"
-                      />
-                      <button onClick={() => handleTopUp(g.id)}
-                        className="px-3 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold">
-                        Simpan
-                      </button>
-                      <button onClick={() => { setTopUpId(null); setTopUpAmount(""); }}
-                        className="px-3 py-2 rounded-lg border border-[#E7DED4] text-xs font-extrabold text-stone-500 hover:bg-stone-50">
-                        Batal
-                      </button>
-                    </div>
-                  ) : (
-                    <button onClick={() => { setTopUpId(g.id); setTopUpAmount(""); }}
-                      className="w-full py-2 rounded-lg border border-[#E7DED4] text-[11px] font-extrabold text-stone-500 hover:bg-stone-50 hover:text-primary transition-colors">
-                      + Tambah Dana
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {/* Table */}
+      <div className="sketch-card bg-white overflow-hidden">
+        <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
+          <h2 className="text-sm font-extrabold text-stone-900">Daftar Target</h2>
+          <span className="text-[10px] font-black text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
+            {goals.length} target
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-[#FAF6F0] border-b border-[#E7DED4]">
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">No</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Nama Target</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Target</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Terkumpul</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px] w-36">Progress</th>
+                <th className="text-left px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Deadline</th>
+                <th className="text-right px-5 py-3 font-extrabold text-stone-500 uppercase tracking-wider text-[10px]">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-stone-300 font-bold">Memuat...</td>
+                </tr>
+              ) : goals.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-stone-300">
+                    <p className="font-bold text-sm">Belum ada target</p>
+                    <p className="text-xs mt-1">Klik &quot;Tambah Target&quot; untuk mulai menabung.</p>
+                  </td>
+                </tr>
+              ) : goals.map((g, i) => {
+                const isDone = g.current_amount >= g.target_amount;
+                const pct = Math.min(g.pct, 100);
+                return (
+                  <>
+                    <tr key={g.id} className="border-b border-[#E7DED4] hover:bg-[#FAF6F0] transition-colors group">
+                      <td className="px-5 py-4 text-stone-400 font-bold">{i + 1}</td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isDone ? "bg-emerald-50" : "bg-primary/10"}`}>
+                            {isDone
+                              ? <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                              : <Target className="w-4 h-4 text-primary" />
+                            }
+                          </div>
+                          <span className="font-bold text-stone-700">{g.name}</span>
+                          {isDone && (
+                            <span className="text-[9px] font-black bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full">Tercapai 🎉</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-right font-bold text-stone-600">{formatRp(g.target_amount)}</td>
+                      <td className="px-5 py-4 text-right">
+                        <span className={`font-black ${isDone ? "text-emerald-600" : "text-primary"}`}>{formatRp(g.current_amount)}</span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-1.5 rounded-full transition-all duration-500 ${isDone ? "bg-emerald-400" : "bg-primary"}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className={`text-[10px] font-black w-8 text-right ${isDone ? "text-emerald-600" : "text-primary"}`}>
+                            {g.pct.toFixed(0)}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="flex items-center gap-1.5 text-stone-400 font-bold">
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(g.deadline)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                          {!isDone && (
+                            <button
+                              onClick={() => { setTopUpId(topUpId === g.id ? null : g.id); setTopUpAmount(""); }}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all"
+                            >
+                              <PlusCircle className="w-3.5 h-3.5" />
+                              <span className="text-[10px] font-bold">Top Up</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(g.id)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold">Hapus</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {topUpId === g.id && (
+                      <tr key={`${g.id}-topup`} className="border-b border-[#E7DED4] bg-primary/5">
+                        <td colSpan={7} className="px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-extrabold text-stone-500">Tambah Dana ke &quot;{g.name}&quot;:</span>
+                            <input
+                              type="number"
+                              min={1}
+                              autoFocus
+                              placeholder="Jumlah (Rp)"
+                              value={topUpAmount}
+                              onChange={(e) => setTopUpAmount(e.target.value)}
+                              onKeyDown={(e) => e.key === "Enter" && handleTopUp(g.id)}
+                              className="px-3 py-2 bg-white border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold placeholder:text-stone-300 w-48"
+                            />
+                            <button onClick={() => handleTopUp(g.id)}
+                              className="px-3 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold">
+                              Simpan
+                            </button>
+                            <button onClick={() => { setTopUpId(null); setTopUpAmount(""); }}
+                              className="px-3 py-2 rounded-lg border border-[#E7DED4] text-xs font-extrabold text-stone-500 hover:bg-stone-50">
+                              Batal
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
