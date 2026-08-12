@@ -38,8 +38,8 @@ export async function verifySession(): Promise<SessionPayload | null> {
         if (!token) return null;
         const { payload } = await jwtVerify(token, secret);
         const userId = payload.userId as string;
-        // Support both BigSerial (integers) and UUIDs just in case
-        if (!/^\d+$/.test(userId) && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        // users.id is BIGSERIAL — reject placeholder UUIDs from the pre-auth demo era
+        if (!/^\d+$/.test(userId)) {
             return null;
         }
         return {
