@@ -16,9 +16,10 @@ function createPool() {
         if (connStr.includes("sslmode=require") && !connStr.includes("uselibpqcompat")) {
             connStr = connStr.replace("sslmode=require", "sslmode=verify-full");
         }
+        const hasSslDisable = connStr.includes("sslmode=disable") || process.env.DISABLE_DB_SSL === "true" || process.env.DB_SSL === "false";
         return new Pool({
             connectionString: connStr,
-            ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+            ssl: (process.env.NODE_ENV === "production" && !hasSslDisable) ? { rejectUnauthorized: false } : undefined,
         });
     }
 
