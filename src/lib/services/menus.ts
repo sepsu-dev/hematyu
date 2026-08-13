@@ -29,8 +29,8 @@ export async function getMenusForUser(userId: string): Promise<MenuNode[]> {
                 `WITH privilege_menus AS (
                    SELECT DISTINCT p.menu_id
                    FROM user_privileges p
-                   JOIN user_group_members ugm ON ugm.group_id = p.group_id
-                   WHERE ugm.user_id = $1
+                   JOIN users u ON u.group_id = p.group_id
+                   WHERE u.id = $1
                  )
                  SELECT m.id, m.parent_id, m.label, m.path, m.icon_name, m.sort_order
                  FROM menus m

@@ -386,7 +386,7 @@ export default function TransactionsPage() {
                   <th className="p-4">Tanggal</th>
                   <th className="p-4">Keterangan</th>
                   <th className="p-4">Kategori</th>
-                  <th className="p-4">Rekening</th>
+                  <th className="p-4">Kantong</th>
                   <th className="p-4">Catatan</th>
                   <th className="p-4 text-right">Jumlah</th>
                   <th className="p-4 w-10"></th>
@@ -416,7 +416,7 @@ export default function TransactionsPage() {
                     <th className="p-4">Tanggal</th>
                     <th className="p-4">Keterangan</th>
                     <th className="p-4">Kategori</th>
-                    <th className="p-4">Rekening</th>
+                    <th className="p-4">Kantong</th>
                     <th className="p-4">Catatan</th>
                     <th className="p-4 text-right">Jumlah</th>
                     <th className="p-4 w-10"></th>
@@ -625,9 +625,9 @@ export default function TransactionsPage() {
                       </Select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">Rekening</label>
+                      <label className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">Kantong</label>
                       <Select value={accountId} onValueChange={setAccountId}>
-                        <SelectTrigger className="h-9"><SelectValue placeholder="Pilih rekening..." /></SelectTrigger>
+                        <SelectTrigger className="h-9"><SelectValue placeholder="Pilih kantong..." /></SelectTrigger>
                         <SelectContent>
                           {accounts.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
                         </SelectContent>
@@ -682,7 +682,7 @@ export default function TransactionsPage() {
       <ConfirmDialog
         isOpen={confirmOpen}
         title="Hapus Transaksi"
-        message="Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini akan mengupdate saldo rekening Anda kembali."
+        message="Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini akan mengupdate saldo kantong Anda kembali."
         confirmText="Hapus"
         cancelText="Batal"
         onConfirm={handleConfirmDelete}

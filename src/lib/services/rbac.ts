@@ -12,45 +12,31 @@ export interface AdminUserRow {
 export async function getRbacUsers(): Promise<AdminUserRow[]> {
     const { rows } = await pool.query(
         `SELECT u.id, u.name, u.email, u.created_at,
-                COALESCE(ARRAY_AGG(ugm.group_id) FILTER (WHERE ugm.group_id IS NOT NULL), '{}') AS group_ids
+                COALESCE(ARRAY[u.group_id] FILTER (WHERE u.group_id IS NOT NULL), '{}') AS group_ids
          FROM users u
-         LEFT JOIN user_group_members ugm ON ugm.user_id = u.id
-         GROUP BY u.id, u.name, u.email, u.created_at
          ORDER BY u.created_at ASC`
     );
     return rows;
 }
 
-// ─── Superadmin check (role = grup system Superadmin — satu-satunya sumber) ──
+// ─── Superadmin check ──
 export async function isSuperadmin(userId: string): Promise<boolean> {
     const { rows } = await pool.query(
         `SELECT 1
-         FROM user_group_members ugm
-         JOIN user_groups g ON g.id = ugm.group_id
-         WHERE ugm.user_id = $1 AND g.name = 'Superadmin'`,
+         FROM users u
+         JOIN user_groups g ON g.id = u.group_id
+         WHERE u.id = $1 AND g.name = 'Superadmin'`,
         [userId]
     );
     return rows.length > 0;
 }
 
 export async function setUserGroups(userId: string, groupIds: string[]) {
-    const client = await pool.connect();
-    try {
-        await client.query("BEGIN");
-        await client.query(`DELETE FROM user_group_members WHERE user_id = $1`, [userId]);
-        for (const gid of groupIds) {
-            await client.query(
-                `INSERT INTO user_group_members (user_id, group_id) VALUES ($1, $2)`,
-                [userId, gid]
-            );
-        }
-        await client.query("COMMIT");
-    } catch (e) {
-        await client.query("ROLLBACK");
-        throw e;
-    } finally {
-        client.release();
-    }
+    const gid = groupIds[0] ? groupIds[0] : null;
+    await pool.query(
+        `UPDATE users SET group_id = $2 WHERE id = $1`,
+        [userId, gid]
+    );
 }
 
 // ─── User Groups ─────────────────────────────────────────────────
@@ -65,9 +51,9 @@ export interface UserGroupRow {
 export async function getGroups(): Promise<UserGroupRow[]> {
     const { rows } = await pool.query(
         `SELECT g.id, g.name, g.description, g.is_system,
-                COUNT(ugm.user_id)::int AS member_count
+                COUNT(u.id)::int AS member_count
          FROM user_groups g
-         LEFT JOIN user_group_members ugm ON ugm.group_id = g.id
+         LEFT JOIN users u ON u.group_id = g.id
          GROUP BY g.id
          ORDER BY g.is_system DESC, g.name ASC`
     );

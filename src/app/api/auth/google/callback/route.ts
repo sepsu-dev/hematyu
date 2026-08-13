@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { createSession, verifySession } from "@/lib/auth/session";
-import { ensureDefaultAccount } from "@/lib/services/accounts";
+import { ensureDefaultWallet } from "@/lib/services/wallets";
 
 interface GoogleTokenResult {
     access_token: string;
@@ -99,19 +99,12 @@ export async function GET(req: NextRequest) {
         // 4. Register new user if not exist
         if (!user) {
             const insertResult = await client.query(
-                `INSERT INTO users (name, email, password_hash, google_linked)
-                 VALUES ($1, $2, NULL, TRUE)
+                `INSERT INTO users (name, email, password_hash, google_linked, group_id)
+                 VALUES ($1, $2, NULL, TRUE, (SELECT id FROM user_groups WHERE name = 'User'))
                  RETURNING id, name, email, google_linked`,
                 [googleUser.name, googleUser.email.toLowerCase()]
             );
             user = insertResult.rows[0];
-
-            // Default group: User (role = group — satu-satunya sumber seragam dengan register)
-            await client.query(
-                `INSERT INTO user_group_members (user_id, group_id)
-                 SELECT $1, id FROM user_groups WHERE name = 'User'`,
-                [user.id]
-            );
 
             // Copy default categories (global master rows, user_id NULL)
             await client.query(
@@ -132,8 +125,7 @@ export async function GET(req: NextRequest) {
                 user.google_linked = true;
             }
         }
-        // Ensure every user has at least one pocket (new or existing, idempotent)
-        await ensureDefaultAccount(user.id, client);
+        await ensureDefaultWallet(user.id, client);
 
         await client.query("COMMIT");
 

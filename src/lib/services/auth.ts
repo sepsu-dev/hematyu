@@ -1,6 +1,6 @@
 import { pool } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { ensureDefaultAccount } from "@/lib/services/accounts";
+import { ensureDefaultWallet } from "@/lib/services/wallets";
 
 export interface AuthUser {
     id: string;
@@ -37,19 +37,12 @@ export async function registerUser(data: {
     try {
         await client.query("BEGIN");
         const { rows } = await client.query(
-            `INSERT INTO users (name, email, password_hash, phone)
-             VALUES ($1, $2, $3, $4)
+            `INSERT INTO users (name, email, password_hash, phone, group_id)
+             VALUES ($1, $2, $3, $4, (SELECT id FROM user_groups WHERE name = 'User'))
              RETURNING id, name, email, phone`,
             [data.name.trim(), data.email.toLowerCase(), hash, data.phone ?? null]
         );
         const user = rows[0];
-
-        // Default group: User (role = group — satu-satunya sumber)
-        await client.query(
-            `INSERT INTO user_group_members (user_id, group_id)
-             SELECT $1, id FROM user_groups WHERE name = 'User'`,
-            [user.id]
-        );
 
         // Copy default categories from a global template user
         // Template: the seed demo user's categories (is_default = true)
@@ -61,7 +54,7 @@ export async function registerUser(data: {
             [user.id]
         );
 
-        await ensureDefaultAccount(user.id, client);
+        await ensureDefaultWallet(user.id, client);
 
         await client.query("COMMIT");
         return user;

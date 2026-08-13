@@ -50,7 +50,7 @@ export async function getAdminUserList(): Promise<AdminUserRow[]> {
         SELECT
           u.id, u.name, u.email,
           COALESCE(
-            ARRAY_AGG(DISTINCT g.name) FILTER (WHERE g.name IS NOT NULL),
+            ARRAY[g.name] FILTER (WHERE g.name IS NOT NULL),
             '{}'
           )::text[]                                                                  AS group_names,
           u.created_at,
@@ -59,10 +59,9 @@ export async function getAdminUserList(): Promise<AdminUserRow[]> {
           COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END), 0)::float AS total_expense,
           MAX(t.date)                                                                AS last_transaction
         FROM users u
-        LEFT JOIN user_group_members ugm ON ugm.user_id = u.id
-        LEFT JOIN user_groups g ON g.id = ugm.group_id
+        LEFT JOIN user_groups g ON g.id = u.group_id
         LEFT JOIN transactions t ON t.user_id = u.id
-        GROUP BY u.id, u.name, u.email, u.created_at
+        GROUP BY u.id, u.name, u.email, u.created_at, g.name
         ORDER BY u.created_at ASC
     `);
     return rows;

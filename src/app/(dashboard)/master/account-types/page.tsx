@@ -90,7 +90,7 @@ export default function MasterAccountTypesPage() {
       await createMasterAccountTypeAction({ code: code.trim(), label: label.trim(), icon_name: iconName, color });
       closeModal();
       load();
-      showToast("Tipe rekening berhasil ditambahkan!");
+      showToast("Tipe kantong berhasil ditambahkan!");
     } catch {
       setError("Gagal menyimpan. Kode mungkin sudah ada.");
     } finally {
@@ -101,7 +101,7 @@ export default function MasterAccountTypesPage() {
   const handleDelete = async (id: string) => {
     await deleteMasterAccountTypeAction(id);
     load();
-    showToast("Tipe rekening berhasil dihapus.");
+    showToast("Tipe kantong berhasil dihapus.");
   };
 
   return (
@@ -115,8 +115,8 @@ export default function MasterAccountTypesPage() {
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Tipe Rekening</h1>
-          <p className="text-xs text-stone-500 mt-0.5">Kelola tipe rekening yang tersedia untuk semua user. Tipe baru langsung bisa dipilih user.</p>
+          <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Tipe Kantong</h1>
+          <p className="text-xs text-stone-500 mt-0.5">Kelola tipe kantong yang tersedia untuk semua user. Tipe baru langsung bisa dipilih user.</p>
         </div>
         <button onClick={openModal}
           className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white hover:bg-amber-600 transition-all rounded-lg shadow-sm text-xs font-extrabold">
@@ -131,7 +131,7 @@ export default function MasterAccountTypesPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal} />
           <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-extrabold text-stone-900">Tambah Tipe Rekening Baru</h2>
+              <h2 className="text-sm font-extrabold text-stone-900">Tambah Tipe Kantong Baru</h2>
               <button type="button" onClick={closeModal} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors">
                 <X className="w-4 h-4" />
               </button>
@@ -184,7 +184,7 @@ export default function MasterAccountTypesPage() {
         <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-amber-600" />
-            <h2 className="text-sm font-extrabold text-stone-900">Daftar Tipe Rekening</h2>
+            <h2 className="text-sm font-extrabold text-stone-900">Daftar Tipe Kantong</h2>
           </div>
           <span className="text-[10px] font-black text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">{types.length} tipe</span>
         </div>
@@ -204,7 +204,7 @@ export default function MasterAccountTypesPage() {
               {loading ? (
                 <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Memuat...</td></tr>
               ) : types.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Belum ada tipe rekening</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Belum ada tipe kantong</td></tr>
               ) : types.map((t, i) => (
                 <tr key={t.id} className="border-b border-[#E7DED4] last:border-0 hover:bg-[#FAF6F0] transition-colors group">
                   <td className="px-5 py-4 text-stone-400 font-bold">{i + 1}</td>

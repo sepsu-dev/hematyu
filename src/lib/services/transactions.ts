@@ -17,7 +17,7 @@ export interface TransactionRow {
 
 const SELECT_FIELDS = `
   t.id, t.date, t.description, c.name AS category, t.category_id,
-  t.account_id, a.name AS account,
+  t.wallet_id AS account_id, w.name AS account,
   t.amount::float AS amount, t.type, t.note
 `;
 
@@ -42,7 +42,7 @@ export async function getTransactions(userId: string, params: GetTransactionsPar
         SELECT ${SELECT_FIELDS}
         FROM transactions t
         JOIN categories c ON c.id = t.category_id
-        LEFT JOIN accounts a ON a.id = t.account_id
+        LEFT JOIN wallets w ON w.id = t.wallet_id
         WHERE ${conditions.join(" AND ")}
         ORDER BY t.date DESC
     `;
@@ -89,9 +89,9 @@ export async function createTransaction(data: {
     accountId?: string;
 }): Promise<TransactionRow> {
     const { rows } = await pool.query(
-        `INSERT INTO transactions (user_id, category_id, account_id, type, amount, description, note, date)
+        `INSERT INTO transactions (user_id, category_id, wallet_id, type, amount, description, note, date)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-     RETURNING id, date, description, category_id, account_id,
+     RETURNING id, date, description, category_id, wallet_id AS account_id,
                amount::float AS amount, type, note`,
         [
             data.userId,

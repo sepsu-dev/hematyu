@@ -20,10 +20,11 @@ import {
     deleteCategory,
 } from "@/lib/services/categories";
 import {
-    getAccounts,
-    createAccount,
-    deleteAccount,
-} from "@/lib/services/accounts";
+    getWallets,
+    createWallet,
+    deleteWallet,
+    getWalletTypes,
+} from "@/lib/services/wallets";
 import {
     getBudgets,
     createBudget,
@@ -38,7 +39,7 @@ import {
 import { updateProfile, getProfile, setPassword } from "@/lib/services/profile";
 import { hashPassword } from "@/lib/auth/password";
 import { getCategories } from "@/lib/services/categories";
-import { getAccountTypes } from "@/lib/services/accounts";
+
 import {
     getMasterCategories,
     createMasterCategory,
@@ -200,19 +201,19 @@ export async function createPasswordAction(input: { password: string }) {
 
 export async function getAccountsAction() {
     const session = await requireUser();
-    return await getAccounts(session.userId);
+    return await getWallets(session.userId);
 }
 
 export async function createAccountAction(input: {
     name: string;
-    type: string;
+    accountTypeId: string;
     balance?: number;
 }) {
     const session = await requireUser();
-    await createAccount({
+    await createWallet({
         userId: session.userId,
         name: input.name,
-        type: input.type,
+        walletTypeId: input.accountTypeId,
         balance: input.balance,
     });
     revalidatePath("/wallets");
@@ -220,7 +221,7 @@ export async function createAccountAction(input: {
 
 export async function deleteAccountAction(id: string) {
     const session = await requireUser();
-    await deleteAccount(id, session.userId);
+    await deleteWallet(id, session.userId);
     revalidatePath("/wallets");
 }
 
@@ -285,7 +286,7 @@ export async function deleteGoalAction(id: string) {
 
 export async function getAccountTypesAction() {
     await requireUser();
-    return await getAccountTypes();
+    return await getWalletTypes();
 }
 
 // ─── Admin — Kategori ──────────────────────────────────────────────────

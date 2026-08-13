@@ -87,7 +87,7 @@ export default function AccountsPage() {
     load();
     getAccountTypesAction().then((types) => {
       setAccountTypes(types);
-      if (types.length > 0) setType(types[0].code);
+      if (types.length > 0) setType(types[0].id);
     }).catch(() => { });
   }, []);
 
@@ -109,16 +109,16 @@ export default function AccountsPage() {
     e.preventDefault();
     if (saving) return;
     const num = parseInt(balance.replace(/[^0-9]/g, ""), 10);
-    if (!name.trim()) { setError("Nama rekening tidak boleh kosong."); return; }
+    if (!name.trim()) { setError("Nama kantong tidak boleh kosong."); return; }
     if (isNaN(num) || num < 0) { setError("Masukkan saldo awal yang valid."); return; }
     setSaving(true);
     setError("");
     try {
-      await createAccountAction({ name: name.trim(), type, balance: num });
+      await createAccountAction({ name: name.trim(), accountTypeId: type, balance: num });
       closeModal();
       load();
     } catch {
-      setError("Gagal menyimpan rekening.");
+      setError("Gagal menyimpan kantong.");
     } finally {
       setSaving(false);
     }
@@ -137,7 +137,7 @@ export default function AccountsPage() {
       await deleteAccountAction(deleteId);
       load();
     } catch (err: any) {
-      alert(err?.message || "Gagal menghapus rekening.");
+      alert(err?.message || "Gagal menghapus kantong.");
     } finally {
       setLoading(false);
       setDeleteId(null);
@@ -148,13 +148,13 @@ export default function AccountsPage() {
     <div className="space-y-6 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Rekening</h1>
-          <p className="text-xs text-stone-500 mt-0.5">Kelola rekening keuangan Anda.</p>
+          <h1 className="text-xl font-extrabold text-stone-900 tracking-tight">Kantong</h1>
+          <p className="text-xs text-stone-500 mt-0.5">Kelola kantong keuangan Anda.</p>
         </div>
         <button onClick={openModal}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white hover:bg-primary/90 transition-all rounded-lg shadow-sm text-xs font-extrabold">
           <Plus className="w-3.5 h-3.5" />
-          Tambah Rekening
+          Tambah Kantong
         </button>
       </div>
 
@@ -165,7 +165,7 @@ export default function AccountsPage() {
           <p className="text-3xl font-black text-stone-900 tracking-tight mt-1">
             {loading ? "..." : formatRp(totalBalance)}
           </p>
-          <p className="text-[11px] text-stone-400 font-semibold mt-1">{accounts.length} rekening terhubung</p>
+          <p className="text-[11px] text-stone-400 font-semibold mt-1">{accounts.length} kantong terhubung</p>
         </div>
         <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
           <Wallet className="w-7 h-7 text-primary" />
@@ -178,24 +178,24 @@ export default function AccountsPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal} />
           <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-extrabold text-stone-900">Tambah Rekening Baru</h2>
+              <h2 className="text-sm font-extrabold text-stone-900">Tambah Kantong Baru</h2>
               <button type="button" onClick={closeModal} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleCreate} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Nama Rekening</label>
+                <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Nama Kantong</label>
                 <input type="text" value={name} onChange={(e) => { setName(e.target.value); setError(""); }}
                   placeholder="Contoh: BCA, GoPay, Dompet..."
                   className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold placeholder:text-stone-300" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Tipe Rekening</label>
+                <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Tipe Kantong</label>
                 <select value={type} onChange={(e) => setType(e.target.value)}
                   className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold">
                   {accountTypes.map((t) => (
-                    <option key={t.code} value={t.code}>{t.label}</option>
+                    <option key={t.id} value={t.id}>{t.label}</option>
                   ))}
                 </select>
               </div>
@@ -214,7 +214,7 @@ export default function AccountsPage() {
                 <button type="submit" disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60">
                   {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-                  Simpan Rekening
+                  Simpan Kantong
                 </button>
               </div>
             </form>
@@ -225,9 +225,9 @@ export default function AccountsPage() {
       {/* Table */}
       <div className="sketch-card bg-white overflow-hidden">
         <div className="p-5 border-b border-[#E7DED4] flex items-center justify-between">
-          <h2 className="text-sm font-extrabold text-stone-900">Daftar Rekening</h2>
+          <h2 className="text-sm font-extrabold text-stone-900">Daftar Kantong</h2>
           <span className="text-[10px] font-black text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
-            {accounts.length} rekening
+            {accounts.length} kantong
           </span>
         </div>
         <div className="overflow-x-auto">
@@ -262,8 +262,8 @@ export default function AccountsPage() {
               ) : accounts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center py-12 text-stone-300">
-                    <p className="font-bold text-sm">Belum ada rekening</p>
-                    <p className="text-xs mt-1">Klik "Tambah Rekening" untuk mulai.</p>
+                    <p className="font-bold text-sm">Belum ada kantong</p>
+                    <p className="text-xs mt-1">Klik "Tambah Kantong" untuk mulai.</p>
                   </td>
                 </tr>
               ) : accounts.map((acc, i) => {
@@ -313,8 +313,8 @@ export default function AccountsPage() {
 
       <ConfirmDialog
         isOpen={confirmOpen}
-        title="Hapus Rekening"
-        message="Apakah Anda yakin ingin menghapus rekening ini? Seluruh riwayat transaksi yang terkait dengan rekening ini juga mungkin akan terpengaruh."
+        title="Hapus Kantong"
+        message="Apakah Anda yakin ingin menghapus kantong ini? Seluruh riwayat transaksi yang terkait dengan kantong ini juga mungkin akan terpengaruh."
         confirmText="Hapus"
         cancelText="Batal"
         onConfirm={handleConfirmDelete}

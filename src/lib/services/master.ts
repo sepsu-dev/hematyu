@@ -47,9 +47,9 @@ export async function deleteMasterCategory(id: string): Promise<boolean> {
     return (rowCount ?? 0) > 0;
 }
 
-// ─── Master Account Types ─────────────────────────────────────────────────────
+// ─── Master Account Types / Wallet Types ──────────────────────────────────────────
 
-export interface MasterAccountTypeRow {
+export interface MasterWalletTypeRow {
     id: string;
     code: string;
     label: string;
@@ -58,24 +58,28 @@ export interface MasterAccountTypeRow {
     created_at: string;
 }
 
-export async function getMasterAccountTypes(): Promise<MasterAccountTypeRow[]> {
+export type MasterAccountTypeRow = MasterWalletTypeRow;
+
+export async function getMasterWalletTypes(): Promise<MasterWalletTypeRow[]> {
     const { rows } = await pool.query(
         `SELECT id, code, label, icon_name, color, created_at
-         FROM master_account_types
+         FROM wallet_types
          WHERE deleted_at IS NULL
          ORDER BY created_at ASC`
     );
     return rows;
 }
 
-export async function createMasterAccountType(data: {
+export const getMasterAccountTypes = getMasterWalletTypes;
+
+export async function createMasterWalletType(data: {
     code: string;
     label: string;
     icon_name?: string;
     color?: string;
-}): Promise<MasterAccountTypeRow> {
+}): Promise<MasterWalletTypeRow> {
     const { rows } = await pool.query(
-        `INSERT INTO master_account_types (code, label, icon_name, color)
+        `INSERT INTO wallet_types (code, label, icon_name, color)
          VALUES ($1, $2, $3, $4)
          RETURNING id, code, label, icon_name, color, created_at`,
         [
@@ -88,12 +92,16 @@ export async function createMasterAccountType(data: {
     return rows[0];
 }
 
-export async function deleteMasterAccountType(id: string): Promise<boolean> {
+export const createMasterAccountType = createMasterWalletType;
+
+export async function deleteMasterWalletType(id: string): Promise<boolean> {
     const { rowCount } = await pool.query(
-        `UPDATE master_account_types
+        `UPDATE wallet_types
          SET deleted_at = NOW()
          WHERE id = $1 AND deleted_at IS NULL`,
         [id]
     );
     return (rowCount ?? 0) > 0;
 }
+
+export const deleteMasterAccountType = deleteMasterWalletType;

@@ -17,13 +17,13 @@ import {
 const pathMap: Record<string, { group: string; name: string }> = {
   "/dashboard": { group: "Aplikasi", name: "Dashboard" },
   "/transactions": { group: "Menu", name: "Transaksi" },
-  "/wallets": { group: "Menu", name: "Rekening" },
+  "/wallets": { group: "Menu", name: "Kantong" },
   "/budgets": { group: "Menu", name: "Anggaran" },
   "/goals": { group: "Menu", name: "Tujuan" },
   "/reports": { group: "Menu", name: "Laporan" },
   "/settings": { group: "Menu", name: "Pengaturan" },
   "/master/categories": { group: "Admin", name: "Kategori" },
-  "/master/account-types": { group: "Admin", name: "Jenis Rekening" },
+  "/master/account-types": { group: "Admin", name: "Jenis Kantong" },
   "/master/laporan": { group: "Admin", name: "Laporan Admin" },
 };
 

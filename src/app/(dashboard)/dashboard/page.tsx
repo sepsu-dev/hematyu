@@ -136,7 +136,6 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-extrabold text-stone-900 tracking-tight flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-stone-400" />
             Dashboard
           </h1>
           <p className="text-xs text-stone-500 mt-0.5">Ringkasan keuangan Anda hari ini.</p>
