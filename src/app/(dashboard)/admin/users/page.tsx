@@ -143,7 +143,7 @@ export default function AdminUsersPage() {
             <div className="rounded-xl bg-muted/50 p-6 border border-border/60">
                 <div className="space-y-3">
                     {loading ? (
-                        <p className="text-xs font-bold text-muted-foreground text-center py-12">Memuat daftar user...</p>
+                        <div className="flex items-center justify-center py-12"><Spinner size={24} /></div>
                     ) : (
                         users.map((u) => (
                             <div key={u.id} className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-white p-4">

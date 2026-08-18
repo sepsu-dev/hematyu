@@ -190,7 +190,7 @@ export default function MasterCategoriesPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={3} className="text-center py-8 text-stone-300 font-bold">Memuat...</td></tr>
+                  <tr><td colSpan={3} className="text-center py-8"><div className="flex items-center justify-center"><Spinner size={24} /></div></td></tr>
                 ) : income.length === 0 ? (
                   <tr><td colSpan={3} className="text-center py-8 text-stone-300 font-bold">Belum ada kategori masuk</td></tr>
                 ) : income.map((c, i) => {
@@ -241,7 +241,7 @@ export default function MasterCategoriesPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={3} className="text-center py-8 text-stone-300 font-bold">Memuat...</td></tr>
+                  <tr><td colSpan={3} className="text-center py-8"><div className="flex items-center justify-center"><Spinner size={24} /></div></td></tr>
                 ) : expense.length === 0 ? (
                   <tr><td colSpan={3} className="text-center py-8 text-stone-300 font-bold">Belum ada kategori keluar</td></tr>
                 ) : expense.map((c, i) => {

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -220,7 +221,7 @@ export default function DashboardPage() {
 
           <div className="flex-1 h-full min-h-0">
             {loading ? (
-              <p className="text-xs font-bold text-stone-300 w-full text-center py-20">Memuat grafik...</p>
+              <div className="flex items-center justify-center w-full py-20"><Spinner size={24} /></div>
             ) : monthlyData.every((m) => m.income === 0 && m.expense === 0) ? (
               <p className="text-xs font-bold text-stone-300 w-full text-center py-20">Belum ada data bulanan</p>
             ) : (
@@ -300,7 +301,7 @@ export default function DashboardPage() {
 
           <div className="divide-y divide-[#E7DED4]/60 max-h-[280px] overflow-y-auto pr-1 flex-1">
             {loading ? (
-              <p className="text-center py-12 text-stone-300 text-xs font-bold">Memuat daftar...</p>
+              <div className="flex items-center justify-center py-12"><Spinner size={24} /></div>
             ) : recentTx.map((tx) => (
               <div key={tx.id} className="flex items-center justify-between py-2.5 hover:bg-stone-50/60 transition-colors group px-2 rounded-lg">
                 <div className="flex items-center gap-3 min-w-0">
@@ -341,7 +342,7 @@ export default function DashboardPage() {
           </div>
 
           {loading ? (
-            <p className="text-xs font-bold text-stone-300 text-center py-12">Memuat grafik...</p>
+            <div className="flex items-center justify-center py-12"><Spinner size={24} /></div>
           ) : donutData.length === 0 ? (
             <p className="text-xs text-stone-300 text-center py-12">Belum ada pengeluaran bulanan</p>
           ) : (

@@ -222,7 +222,7 @@ export default function MasterAccountTypesPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Memuat...</td></tr>
+                <tr><td colSpan={6} className="text-center py-12"><div className="flex items-center justify-center"><Spinner size={24} /></div></td></tr>
               ) : types.length === 0 ? (
                 <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Belum ada tipe kantong</td></tr>
               ) : types.map((t, i) => (

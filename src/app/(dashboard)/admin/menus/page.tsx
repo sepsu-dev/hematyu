@@ -226,7 +226,7 @@ export default function AdminMenusPage() {
 
             <div className="rounded-xl bg-muted/50 p-6 border border-border/60">
                 {loading ? (
-                    <p className="text-xs font-bold text-stone-300 text-center py-12">Memuat menu...</p>
+                    <div className="flex items-center justify-center py-12"><Spinner size={24} /></div>
                 ) : (
                     <div className="space-y-2">
                         {parents.map((p) => {

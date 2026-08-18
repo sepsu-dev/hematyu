@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { KeyRound } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
     getGroupsAction,
     getRbacMenusAction,
@@ -123,7 +124,7 @@ export default function AdminUserPrivilegesPage() {
                 </div>
 
                 {loading ? (
-                    <p className="text-xs font-bold text-muted-foreground text-center py-12">Memuat hak akses...</p>
+                    <div className="flex items-center justify-center py-12"><Spinner size={24} /></div>
                 ) : (
                     <div className="space-y-6">
                         {menuParents.map((parent) => {

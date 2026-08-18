@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Users,
   ArrowLeftRight,
@@ -157,7 +158,7 @@ export default function AdminLaporanPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Memuat data...</td></tr>
+                <tr><td colSpan={6} className="text-center py-12"><div className="flex items-center justify-center"><Spinner size={24} /></div></td></tr>
               ) : users.length === 0 ? (
                 <tr><td colSpan={6} className="text-center py-12 text-stone-300 font-bold">Belum ada user</td></tr>
               ) : users.map((u, i) => {

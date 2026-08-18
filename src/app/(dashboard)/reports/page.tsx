@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   TrendingUp,
   TrendingDown,
@@ -210,7 +211,7 @@ export default function ReportsPage() {
           </div>
           <div className="h-56">
             {loading ? (
-              <p className="text-sm font-bold text-stone-300 w-full text-center py-20">Memuat...</p>
+              <div className="flex items-center justify-center w-full py-20"><Spinner size={24} /></div>
             ) : chartData.length === 0 ? (
               <p className="text-sm font-bold text-stone-300 w-full text-center py-20">Belum ada data</p>
             ) : (
@@ -251,7 +252,7 @@ export default function ReportsPage() {
               <p className="text-[11px] text-stone-400 mt-0.5">Distribusi pengeluaran per kategori</p>
             </div>
             {loading ? (
-              <p className="text-sm font-bold text-stone-300 text-center py-8">Memuat...</p>
+              <div className="flex items-center justify-center py-8"><Spinner size={24} /></div>
             ) : donutData.length === 0 ? (
               <p className="text-xs text-stone-300 text-center py-8">Belum ada pengeluaran</p>
             ) : (
