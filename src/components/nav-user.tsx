@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sidebar"
 import { ChevronsUpDownIcon, UserIcon, LogOutIcon } from "lucide-react"
 import { logoutAction } from "@/app/actions"
+import Link from "next/link"
 
 function getInitials(name: string) {
   return name
@@ -83,10 +84,10 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <a href="/settings">
+              <Link href="/settings">
                 <UserIcon className="size-4" />
                 Pengaturan
-              </a>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => logoutAction()} className="text-red-500 hover:text-red-600 cursor-pointer">

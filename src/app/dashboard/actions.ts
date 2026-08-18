@@ -440,9 +440,9 @@ export async function getMenuActionsAction() {
     return await getMenuActions();
 }
 
-export async function createMenuActionAction(input: { menu_id: string; code: string; label: string }) {
+export async function createMenuActionAction(input: { code: string; label: string }) {
     await requireSuperadmin();
-    await createMenuActionService(input.menu_id, input.code, input.label);
+    await createMenuActionService(input.code, input.label);
     revalidatePath("/admin/menu-actions");
 }
 

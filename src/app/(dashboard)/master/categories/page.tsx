@@ -1,13 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Tag, Plus, Trash2, Check, Loader2, X } from "lucide-react";
+import { Tag, Plus, Trash2, Check, X } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   getMasterCategoriesAction,
   createMasterCategoryAction,
   deleteMasterCategoryAction,
 } from "@/app/dashboard/actions";
 import { IconListGrid, getIcon } from "@/components/icon-list";
+import {
+  ConfirmDialog,
+} from "@/components/confirm-dialog";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MasterCategory {
   id: string;
@@ -26,7 +38,8 @@ export default function MasterCategoriesPage() {
   const [newType, setNewType] = useState<"INCOME" | "EXPENSE">("EXPENSE");
   const [newIconName, setNewIconName] = useState("circle");
   const [adding, setAdding] = useState(false);
-  const [toast, setToast] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const load = () => {
     getMasterCategoriesAction()
@@ -36,11 +49,6 @@ export default function MasterCategoriesPage() {
   };
 
   useEffect(() => { load(); }, []);
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 3000);
-  };
 
   const openModal = () => {
     setNewName("");
@@ -60,21 +68,34 @@ export default function MasterCategoriesPage() {
     setAdding(true);
     try {
       await createMasterCategoryAction({ name: val, type: newType, iconName: newIconName });
+      toast.success("Kategori master berhasil ditambahkan!");
       setNewName("");
       closeModal();
       load();
-      showToast("Kategori berhasil ditambahkan!");
-    } catch {
-      // ignore
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal menambahkan kategori master.");
     } finally {
       setAdding(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteMasterCategoryAction(id);
-    load();
-    showToast("Kategori berhasil dihapus.");
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+    setConfirmOpen(false);
+    try {
+      await deleteMasterCategoryAction(deleteId);
+      toast.success("Kategori master berhasil dihapus!");
+      load();
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal menghapus kategori master.");
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const income = categories.filter((c) => c.type === "INCOME");
@@ -82,13 +103,6 @@ export default function MasterCategoriesPage() {
 
   return (
     <div className="space-y-6 p-6 relative">
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-20 right-8 bg-amber-500 text-white px-4 py-3 rounded-lg shadow-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-50">
-          <Check className="w-3.5 h-3.5" />
-          <span>{toast}</span>
-        </div>
-      )}
 
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -122,11 +136,15 @@ export default function MasterCategoriesPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Tipe</label>
-                <select value={newType} onChange={(e) => setNewType(e.target.value as "INCOME" | "EXPENSE")}
-                  className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 text-stone-900 text-xs font-bold">
-                  <option value="INCOME">Uang Masuk</option>
-                  <option value="EXPENSE">Uang Keluar</option>
-                </select>
+                <Select value={newType} onValueChange={(val) => setNewType(val as "INCOME" | "EXPENSE")}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih tipe..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INCOME">Uang Masuk</SelectItem>
+                    <SelectItem value="EXPENSE">Uang Keluar</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Ikon</label>
@@ -139,7 +157,7 @@ export default function MasterCategoriesPage() {
                 </button>
                 <button type="submit" disabled={adding || !newName.trim()}
                   className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white hover:bg-amber-600 rounded-lg text-xs font-extrabold disabled:opacity-60">
-                  {adding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  {adding ? <Spinner size={14} /> : <Plus className="w-3.5 h-3.5" />}
                   Simpan
                 </button>
               </div>
@@ -187,7 +205,7 @@ export default function MasterCategoriesPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3.5 text-right">
-                        <button onClick={() => handleDelete(c.id)}
+                        <button onClick={() => handleDeleteClick(c.id)}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100">
                           <Trash2 className="w-3.5 h-3.5" />
                           <span className="text-[10px] font-bold">Hapus</span>
@@ -238,7 +256,7 @@ export default function MasterCategoriesPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3.5 text-right">
-                        <button onClick={() => handleDelete(c.id)}
+                        <button onClick={() => handleDeleteClick(c.id)}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100">
                           <Trash2 className="w-3.5 h-3.5" />
                           <span className="text-[10px] font-bold">Hapus</span>
@@ -252,6 +270,17 @@ export default function MasterCategoriesPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Hapus Kategori Master"
+        message="Hapus kategori master ini secara permanen?"
+        confirmText="Hapus"
+        cancelText="Batal"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmOpen(false)}
+        variant="danger"
+      />
     </div>
   );
 }

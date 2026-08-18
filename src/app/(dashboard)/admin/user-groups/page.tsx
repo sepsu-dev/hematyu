@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserCog, Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import { UserCog, Plus, Pencil, Trash2, X } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
     getGroupsAction,
     createGroupAction,
     updateGroupAction,
     deleteGroupAction,
 } from "@/app/dashboard/actions";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 interface UserGroupRow {
     id: string;
@@ -24,6 +27,9 @@ export default function AdminUserGroupsPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState({ name: "", description: "" });
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleteName, setDeleteName] = useState("");
 
     const reload = async () => setGroups(await getGroupsAction());
 
@@ -58,21 +64,40 @@ export default function AdminUserGroupsPage() {
         try {
             if (editingId) {
                 await updateGroupAction(editingId, form);
+                toast.success("Grup berhasil diperbarui!");
             } else {
                 await createGroupAction(form);
+                toast.success("Grup berhasil dibuat!");
             }
             setShowModal(false);
             await reload();
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal menyimpan grup.");
         } finally {
             setSaving(false);
         }
     };
 
-    const handleDelete = async (g: UserGroupRow) => {
+    const handleDeleteClick = (g: UserGroupRow) => {
         if (g.is_system) return;
-        if (!confirm(`Hapus grup "${g.name}"?`)) return;
-        await deleteGroupAction(g.id);
-        await reload();
+        setDeleteId(g.id);
+        setDeleteName(g.name);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteId) return;
+        setConfirmOpen(false);
+        try {
+            await deleteGroupAction(deleteId);
+            toast.success("Grup berhasil dihapus!");
+            await reload();
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal menghapus grup.");
+        } finally {
+            setDeleteId(null);
+            setDeleteName("");
+        }
     };
 
     return (
@@ -131,7 +156,7 @@ export default function AdminUserGroupsPage() {
                                 </button>
                                 <button type="submit" disabled={saving}
                                     className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60 cursor-pointer">
-                                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : editingId ? <Pencil className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                                    {saving ? <Spinner size={14} /> : editingId ? <Pencil className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                                     {editingId ? "Simpan Perubahan" : "Simpan"}
                                 </button>
                             </div>
@@ -169,7 +194,7 @@ export default function AdminUserGroupsPage() {
                                     </button>
                                     {!g.is_system && (
                                         <button
-                                            onClick={() => handleDelete(g)}
+                                            onClick={() => handleDeleteClick(g)}
                                             className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                                             title="Hapus"
                                         >
@@ -182,6 +207,17 @@ export default function AdminUserGroupsPage() {
                     )}
                 </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={confirmOpen}
+                title="Hapus User Group"
+                message={`Hapus grup pengguna "${deleteName}" secara permanen?`}
+                confirmText="Hapus"
+                cancelText="Batal"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setConfirmOpen(false)}
+                variant="danger"
+            />
         </div>
     );
 }

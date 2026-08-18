@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, ShieldCheck, Pencil, X, Loader2 } from "lucide-react";
+import { Users, ShieldCheck, Pencil, X } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
     getRbacUsersAction,
     getGroupsAction,
     setUserGroupsAction,
 } from "@/app/dashboard/actions";
+import { toast } from "sonner";
 
 interface AdminUserRow {
     id: string;
@@ -66,8 +68,11 @@ export default function AdminUsersPage() {
         setSaving(true);
         try {
             await setUserGroupsAction(editingUser.id, groupIds);
+            toast.success("Grup user berhasil diperbarui!");
             setEditingUser(null);
             await reloadUsers();
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal memperbarui grup user.");
         } finally {
             setSaving(false);
         }
@@ -126,7 +131,7 @@ export default function AdminUsersPage() {
                                 </button>
                                 <button type="submit" disabled={saving}
                                     className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60 cursor-pointer">
-                                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+                                    {saving ? <Spinner size={14} /> : <ShieldCheck className="w-3.5 h-3.5" />}
                                     Simpan Akses
                                 </button>
                             </div>

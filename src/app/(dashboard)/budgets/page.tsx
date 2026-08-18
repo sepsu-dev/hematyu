@@ -6,19 +6,27 @@ import {
   PiggyBank,
   Plus,
   Trash2,
-  Loader2,
   AlertTriangle,
   CheckCircle2,
   X,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   getBudgetsAction,
   createBudgetAction,
   deleteBudgetAction,
   getCategoriesAction,
 } from "@/app/dashboard/actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface Budget {
   id: string;
@@ -67,7 +75,6 @@ export default function BudgetsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState("");
 
   const load = (m: string) => {
     setLoading(true);
@@ -113,12 +120,12 @@ export default function BudgetsPage() {
     setError("");
     try {
       await createBudgetAction({ categoryId, amount: num });
+      toast.success("Anggaran berhasil disimpan.");
       closeModal();
       load(month);
-      setToast("Anggaran berhasil disimpan.");
-      setTimeout(() => setToast(""), 3000);
-    } catch {
-      setError("Gagal menyimpan anggaran.");
+    } catch (err: any) {
+      setError(err?.message || "Gagal menyimpan anggaran.");
+      toast.error(err?.message || "Gagal menyimpan anggaran.");
     } finally {
       setSaving(false);
     }
@@ -135,11 +142,10 @@ export default function BudgetsPage() {
     setLoading(true);
     try {
       await deleteBudgetAction(deleteId);
+      toast.success("Anggaran berhasil dihapus.");
       load(month);
-      setToast("Anggaran berhasil dihapus.");
-      setTimeout(() => setToast(""), 3000);
     } catch (err: any) {
-      alert(err?.message || "Gagal menghapus anggaran.");
+      toast.error(err?.message || "Gagal menghapus anggaran.");
     } finally {
       setLoading(false);
       setDeleteId(null);
@@ -148,13 +154,6 @@ export default function BudgetsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-20 right-8 bg-emerald-500 text-white px-4 py-3 rounded-lg shadow-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-50">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>{toast}</span>
-        </div>
-      )}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -223,13 +222,16 @@ export default function BudgetsPage() {
             <form onSubmit={handleCreate} className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Kategori</label>
-                <select value={categoryId} onChange={(e) => { setCategoryId(e.target.value); setError(""); }}
-                  className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold">
-                  <option value="">Pilih kategori...</option>
-                  {availableCats.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                <Select value={categoryId} onValueChange={(val) => { setCategoryId(val); setError(""); }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih kategori..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCats.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {availableCats.length === 0 && (
                   <p className="text-[10px] text-stone-400 font-semibold">Semua kategori sudah punya anggaran.</p>
                 )}
@@ -248,7 +250,7 @@ export default function BudgetsPage() {
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60">
-                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  {saving ? <Spinner size={14} /> : <Plus className="w-3.5 h-3.5" />}
                   Simpan Anggaran
                 </button>
               </div>

@@ -7,7 +7,16 @@ import {
     getRbacMenusAction,
     getPrivilegesAction,
     setPrivilegeAction,
+    getMenuActionsAction,
 } from "@/app/dashboard/actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface UserGroupRow {
     id: string;
@@ -35,21 +44,21 @@ interface PrivilegeRow {
     menu_path: string | null;
 }
 
-const ALL_ACTIONS = ["view", "create", "update", "delete"];
-
 export default function AdminUserPrivilegesPage() {
     const [groups, setGroups] = useState<UserGroupRow[]>([]);
     const [menus, setMenus] = useState<RbacMenuRow[]>([]);
     const [privileges, setPrivileges] = useState<PrivilegeRow[]>([]);
+    const [allActions, setAllActions] = useState<{ id: string; code: string; label: string }[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<string>("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([getGroupsAction(), getRbacMenusAction(), getPrivilegesAction()])
-            .then(([g, m, p]) => {
+        Promise.all([getGroupsAction(), getRbacMenusAction(), getPrivilegesAction(), getMenuActionsAction()])
+            .then(([g, m, p, a]) => {
                 setGroups(g);
                 setMenus(m);
                 setPrivileges(p);
+                setAllActions(a);
                 if (g.length > 0) setSelectedGroup(g[0].id);
                 setLoading(false);
             })
@@ -67,15 +76,25 @@ export default function AdminUserPrivilegesPage() {
         const next = current.includes(action)
             ? current.filter((a) => a !== action)
             : [...current, action];
-        await setPrivilegeAction(selectedGroup, menuId, next);
-        const fresh = await getPrivilegesAction();
-        setPrivileges(fresh);
+        try {
+            await setPrivilegeAction(selectedGroup, menuId, next);
+            toast.success("Hak akses berhasil diperbarui!");
+            const fresh = await getPrivilegesAction();
+            setPrivileges(fresh);
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal memperbarui hak akses.");
+        }
     };
 
     const handleAll = async (menuId: string, checked: boolean) => {
-        await setPrivilegeAction(selectedGroup, menuId, checked ? [...ALL_ACTIONS] : []);
-        const fresh = await getPrivilegesAction();
-        setPrivileges(fresh);
+        try {
+            await setPrivilegeAction(selectedGroup, menuId, checked ? allActions.map((a) => a.code) : []);
+            toast.success("Semua hak akses menu berhasil diperbarui!");
+            const fresh = await getPrivilegesAction();
+            setPrivileges(fresh);
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal memperbarui hak akses.");
+        }
     };
 
     return (
@@ -91,15 +110,16 @@ export default function AdminUserPrivilegesPage() {
             <div className="rounded-xl bg-muted/50 p-6 border border-border/60">
                 <div className="mb-6">
                     <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground mb-1">Grup</p>
-                    <select
-                        value={selectedGroup}
-                        onChange={(e) => setSelectedGroup(e.target.value)}
-                        className="h-9 rounded-md border border-border bg-white px-3 text-xs font-bold text-foreground"
-                    >
+                    <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Pilih grup..." />
+                      </SelectTrigger>
+                      <SelectContent>
                         {groups.map((g) => (
-                            <option key={g.id} value={g.id}>{g.name}</option>
+                          <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
                         ))}
-                    </select>
+                      </SelectContent>
+                    </Select>
                 </div>
 
                 {loading ? (
@@ -122,21 +142,21 @@ export default function AdminUserPrivilegesPage() {
                                                     <label className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground cursor-pointer">
                                                         <input
                                                             type="checkbox"
-                                                            checked={currentPriv(child.id).length === ALL_ACTIONS.length}
+                                                            checked={allActions.length > 0 && currentPriv(child.id).length === allActions.length}
                                                             onChange={(e) => handleAll(child.id, e.target.checked)}
                                                             className="accent-primary"
                                                         />
                                                         Semua
                                                     </label>
-                                                    {ALL_ACTIONS.map((act) => (
-                                                        <label key={act} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground capitalize cursor-pointer">
+                                                    {allActions.map((act) => (
+                                                        <label key={act.code} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground capitalize cursor-pointer">
                                                             <input
                                                                 type="checkbox"
-                                                                checked={currentPriv(child.id).includes(act)}
-                                                                onChange={() => handleToggle(child.id, act)}
+                                                                checked={currentPriv(child.id).includes(act.code)}
+                                                                onChange={() => handleToggle(child.id, act.code)}
                                                                 className="accent-primary"
                                                             />
-                                                            {act}
+                                                            {act.label}
                                                         </label>
                                                     ))}
                                                 </div>
@@ -151,21 +171,21 @@ export default function AdminUserPrivilegesPage() {
                                                     <label className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground cursor-pointer">
                                                         <input
                                                             type="checkbox"
-                                                            checked={currentPriv(parent.id).length === ALL_ACTIONS.length}
+                                                            checked={allActions.length > 0 && currentPriv(parent.id).length === allActions.length}
                                                             onChange={(e) => handleAll(parent.id, e.target.checked)}
                                                             className="accent-primary"
                                                         />
                                                         Semua
                                                     </label>
-                                                    {ALL_ACTIONS.map((act) => (
-                                                        <label key={act} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground capitalize cursor-pointer">
+                                                    {allActions.map((act) => (
+                                                        <label key={act.code} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground capitalize cursor-pointer">
                                                             <input
                                                                 type="checkbox"
-                                                                checked={currentPriv(parent.id).includes(act)}
-                                                                onChange={() => handleToggle(parent.id, act)}
+                                                                checked={currentPriv(parent.id).includes(act.code)}
+                                                                onChange={() => handleToggle(parent.id, act.code)}
                                                                 className="accent-primary"
                                                             />
-                                                            {act}
+                                                            {act.label}
                                                         </label>
                                                     ))}
                                                 </div>

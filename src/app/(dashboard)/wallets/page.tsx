@@ -9,15 +9,23 @@ import {
   CreditCard,
   Plus,
   Trash2,
-  Loader2,
   X,
 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   getAccountsAction,
   createAccountAction,
   deleteAccountAction,
   getAccountTypesAction,
 } from "@/app/dashboard/actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface AccountTypeInfo {
   id: string;
@@ -95,7 +103,7 @@ export default function AccountsPage() {
 
   const openModal = () => {
     setName("");
-    setBalance("");
+    setBalance("0");
     setError("");
     setShowModal(true);
   };
@@ -108,16 +116,19 @@ export default function AccountsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (saving) return;
-    const num = parseInt(balance.replace(/[^0-9]/g, ""), 10);
+    const cleanBalance = balance.trim() === "" ? "0" : balance;
+    const num = parseInt(cleanBalance.replace(/[^0-9]/g, ""), 10);
     if (!name.trim()) { setError("Nama kantong tidak boleh kosong."); return; }
     if (isNaN(num) || num < 0) { setError("Masukkan saldo awal yang valid."); return; }
     setSaving(true);
     setError("");
     try {
       await createAccountAction({ name: name.trim(), accountTypeId: type, balance: num });
+      toast.success("Kantong berhasil disimpan!");
       closeModal();
       load();
     } catch {
+      toast.error("Gagal menyimpan kantong.");
       setError("Gagal menyimpan kantong.");
     } finally {
       setSaving(false);
@@ -135,9 +146,10 @@ export default function AccountsPage() {
     setLoading(true);
     try {
       await deleteAccountAction(deleteId);
+      toast.success("Kantong berhasil dihapus!");
       load();
     } catch (err: any) {
-      alert(err?.message || "Gagal menghapus kantong.");
+      toast.error(err?.message || "Gagal menghapus kantong.");
     } finally {
       setLoading(false);
       setDeleteId(null);
@@ -192,12 +204,16 @@ export default function AccountsPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Tipe Kantong</label>
-                <select value={type} onChange={(e) => setType(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold">
-                  {accountTypes.map((t) => (
-                    <option key={t.id} value={t.id}>{t.label}</option>
-                  ))}
-                </select>
+                <Select value={type} onValueChange={setType}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih tipe kantong..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accountTypes.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Saldo Awal (Rp)</label>
@@ -213,7 +229,7 @@ export default function AccountsPage() {
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60">
-                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  {saving ? <Spinner size={14} /> : <Plus className="w-3.5 h-3.5" />}
                   Simpan Kantong
                 </button>
               </div>

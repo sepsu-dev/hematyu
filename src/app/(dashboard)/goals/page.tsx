@@ -6,18 +6,19 @@ import {
   Target,
   Plus,
   Trash2,
-  Loader2,
   Calendar,
   CheckCircle2,
   PlusCircle,
   X,
 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   getGoalsAction,
   createGoalAction,
   updateGoalAmountAction,
   deleteGoalAction,
 } from "@/app/dashboard/actions";
+import { toast } from "sonner";
 
 interface Goal {
   id: string;
@@ -90,10 +91,12 @@ export default function GoalsPage() {
         targetAmount: num,
         deadline: deadline || undefined,
       });
+      toast.success("Target impian berhasil disimpan!");
       closeModal();
       load();
-    } catch {
-      setError("Gagal menyimpan target.");
+    } catch (err: any) {
+      setError(err?.message || "Gagal menyimpan target.");
+      toast.error(err?.message || "Gagal menyimpan target.");
     } finally {
       setSaving(false);
     }
@@ -119,9 +122,13 @@ export default function GoalsPage() {
     setTopUpError("");
     try {
       await updateGoalAmountAction({ id: topUpGoal.id, amount: num });
+      toast.success("Tabungan berhasil ditambahkan!");
       setTopUpGoal(null);
       setTopUpAmount("");
       load();
+    } catch (err: any) {
+      setTopUpError(err?.message || "Gagal menambah tabungan.");
+      toast.error(err?.message || "Gagal menambah tabungan.");
     } finally {
       setSavingTopUp(false);
     }
@@ -138,7 +145,10 @@ export default function GoalsPage() {
     setLoading(true);
     try {
       await deleteGoalAction(deleteId);
+      toast.success("Target impian berhasil dihapus!");
       load();
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal menghapus target impian.");
     } finally {
       setLoading(false);
       setDeleteId(null);
@@ -216,7 +226,7 @@ export default function GoalsPage() {
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60">
-                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  {saving ? <Spinner size={14} /> : <Plus className="w-3.5 h-3.5" />}
                   Simpan Target
                 </button>
               </div>
@@ -382,7 +392,7 @@ export default function GoalsPage() {
                 </button>
                 <button type="submit" disabled={savingTopUp}
                   className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60">
-                  {savingTopUp ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PlusCircle className="w-3.5 h-3.5" />}
+                  {savingTopUp ? <Spinner size={14} /> : <PlusCircle className="w-3.5 h-3.5" />}
                   Simpan Top Up
                 </button>
               </div>

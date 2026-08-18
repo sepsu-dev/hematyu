@@ -12,7 +12,7 @@ export interface AdminUserRow {
 export async function getRbacUsers(): Promise<AdminUserRow[]> {
     const { rows } = await pool.query(
         `SELECT u.id, u.name, u.email, u.created_at,
-                COALESCE(ARRAY[u.group_id] FILTER (WHERE u.group_id IS NOT NULL), '{}') AS group_ids
+                CASE WHEN u.group_id IS NOT NULL THEN ARRAY[u.group_id::text] ELSE ARRAY[]::text[] END AS group_ids
          FROM users u
          ORDER BY u.created_at ASC`
     );
@@ -210,26 +210,21 @@ export async function deleteMenu(id: string) {
 // ─── Menu Actions ────────────────────────────────────────────────
 export interface MenuActionRow {
     id: string;
-    menu_id: string;
     code: string;
     label: string;
-    menu_label: string;
 }
 
 export async function getMenuActions(): Promise<MenuActionRow[]> {
     const { rows } = await pool.query(
-        `SELECT ma.id, ma.menu_id, ma.code, ma.label, m.label AS menu_label
-         FROM menu_actions ma
-         JOIN menus m ON m.id = ma.menu_id
-         ORDER BY m.sort_order ASC, ma.code ASC`
+        `SELECT id, code, label FROM menu_actions ORDER BY code ASC`
     );
     return rows;
 }
 
-export async function createMenuAction(menuId: string, code: string, label: string) {
+export async function createMenuAction(code: string, label: string) {
     await pool.query(
-        `INSERT INTO menu_actions (menu_id, code, label) VALUES ($1, $2, $3)`,
-        [menuId, code.toLowerCase().trim(), label.trim()]
+        `INSERT INTO menu_actions (code, label) VALUES ($1, $2)`,
+        [code.toLowerCase().trim(), label.trim()]
     );
 }
 

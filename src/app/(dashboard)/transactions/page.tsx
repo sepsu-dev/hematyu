@@ -13,11 +13,11 @@ import {
   X,
   PlusCircle,
   Tag,
-  Loader2,
   ChevronLeft,
   ChevronRight,
   Plus,
 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 import {
   getTransactionsAction,
   getTransactionsCountAction,
@@ -250,11 +251,13 @@ export default function TransactionsPage() {
         note: note.trim() || undefined,
         date: new Date().toISOString(),
       });
+      toast.success("Transaksi berhasil disimpan!");
       closeModal();
       setPage(1);
       await loadPageData(1, filter);
       await loadSummaryData();
     } catch (err: any) {
+      toast.error(err?.message || "Gagal menyimpan transaksi.");
       setError(err?.message || "Gagal menyimpan transaksi.");
     } finally {
       setSaving(false);
@@ -272,9 +275,11 @@ export default function TransactionsPage() {
     setDeletingId(deleteId);
     try {
       await deleteTransactionAction(deleteId);
+      toast.success("Transaksi berhasil dihapus!");
       await loadPageData(page, filter);
       await loadSummaryData();
-    } catch (err) {
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal menghapus transaksi.");
       console.error(err);
     } finally {
       setDeletingId(null);
@@ -454,7 +459,7 @@ export default function TransactionsPage() {
                         <button onClick={() => handleDeleteClick(tx.id)} disabled={deletingId === tx.id}
                           className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive disabled:opacity-100 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition-all cursor-pointer">
                           {deletingId === tx.id
-                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ? <Spinner size={14} />
                             : <Trash2 className="w-3.5 h-3.5" />}
                         </button>
                       </td>
@@ -661,7 +666,7 @@ export default function TransactionsPage() {
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground text-xs font-bold shadow-sm transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 cursor-pointer">
                       {saving ? (
                         <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <Spinner size={14} />
                           Menyimpan...
                         </>
                       ) : (

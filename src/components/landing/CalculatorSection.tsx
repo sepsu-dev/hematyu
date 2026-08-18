@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { Highlighter } from "@/components/highlighter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // ─── Cartoon Cards SVG ──────────────────────────────
 const CardsIllustration = () => (
@@ -100,29 +107,31 @@ export function CalculatorSection() {
             {/* Filter 1 */}
             <div className="flex flex-col space-y-2">
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500">Limit Bulanan</label>
-              <select
-                value={limit}
-                onChange={(e) => setLimit(e.target.value)}
-                className="w-full bg-white border border-stone-900/20 rounded-xl px-4 py-3 text-xs font-bold text-stone-900 focus:outline-none focus:border-[#2563EB] cursor-pointer"
-              >
-                <option value="1jt">Rp 1.000.000</option>
-                <option value="3jt">Rp 3.000.000</option>
-                <option value="5jt">Rp 5.000.000</option>
-              </select>
+              <Select value={limit} onValueChange={setLimit}>
+                <SelectTrigger className="w-full h-11 bg-white border-stone-900/20 rounded-xl px-4 text-xs font-bold text-stone-900">
+                  <SelectValue placeholder="Pilih limit..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1jt">Rp 1.000.000</SelectItem>
+                  <SelectItem value="3jt">Rp 3.000.000</SelectItem>
+                  <SelectItem value="5jt">Rp 5.000.000</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Filter 2 */}
             <div className="flex flex-col space-y-2">
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500">Kategori Belanja</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-white border border-stone-900/20 rounded-xl px-4 py-3 text-xs font-bold text-stone-900 focus:outline-none focus:border-[#2563EB] cursor-pointer"
-              >
-                <option value="makanan">Makanan & Minuman</option>
-                <option value="transportasi">Transportasi</option>
-                <option value="hiburan">Hiburan & Coffee</option>
-              </select>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full h-11 bg-white border-stone-900/20 rounded-xl px-4 text-xs font-bold text-stone-900">
+                  <SelectValue placeholder="Pilih kategori..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="makanan">Makanan & Minuman</SelectItem>
+                  <SelectItem value="transportasi">Transportasi</SelectItem>
+                  <SelectItem value="hiburan">Hiburan & Coffee</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

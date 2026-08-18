@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Menu as MenuIcon, Plus, X, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Menu as MenuIcon, Plus, X, Pencil, Trash2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
     getRbacMenusAction,
     createMenuAction,
@@ -10,6 +11,14 @@ import {
 } from "@/app/dashboard/actions";
 import { IconListGrid, getIcon } from "@/components/icon-list";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface RbacMenuRow {
     id: string;
@@ -74,6 +83,7 @@ export default function AdminMenusPage() {
                     icon_name: form.icon_name || "circle",
                     sort_order: Number(form.sort_order) || 0,
                 });
+                toast.success("Menu berhasil diperbarui!");
             } else {
                 await createMenuAction({
                     label: form.label,
@@ -82,9 +92,12 @@ export default function AdminMenusPage() {
                     icon_name: form.icon_name || "circle",
                     sort_order: Number(form.sort_order) || 0,
                 });
+                toast.success("Menu berhasil dibuat!");
             }
             setShowModal(false);
             await reload();
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal menyimpan menu.");
         } finally {
             setSaving(false);
         }
@@ -101,7 +114,10 @@ export default function AdminMenusPage() {
         setLoading(true);
         try {
             await deleteMenuAction(deleteId);
+            toast.success("Menu berhasil dihapus!");
             await reload();
+        } catch (err: any) {
+            toast.error(err?.message || "Gagal menghapus menu.");
         } finally {
             setLoading(false);
             setDeleteId(null);
@@ -155,16 +171,17 @@ export default function AdminMenusPage() {
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">Induk</label>
-                                <select
-                                    value={form.parent_id}
-                                    onChange={(e) => setForm({ ...form, parent_id: e.target.value })}
-                                    className="h-9 w-full rounded-md border border-border bg-white px-3 text-xs font-bold"
-                                >
-                                    <option value="">— Tanpa Induk (menu utama) —</option>
+                                <Select value={form.parent_id || "none"} onValueChange={(val) => setForm({ ...form, parent_id: val === "none" ? "" : val })}>
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih induk..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="none">— Tanpa Induk (menu utama) —</SelectItem>
                                     {parents.filter(p => p.id !== editId).map((p) => (
-                                        <option key={p.id} value={p.id}>{p.label}</option>
+                                      <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
                                     ))}
-                                </select>
+                                  </SelectContent>
+                                </Select>
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">Path</label>
@@ -198,7 +215,7 @@ export default function AdminMenusPage() {
                                 </button>
                                 <button type="submit" disabled={saving}
                                     className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60 cursor-pointer">
-                                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                                    {saving ? <Spinner size={14} /> : <Plus className="w-3.5 h-3.5" />}
                                     Simpan
                                 </button>
                             </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Save, Check, KeyRound, Loader2, ShieldAlert, Tags, Plus, Trash2, X } from "lucide-react";
+import { User, Save, Check, KeyRound, ShieldAlert, Tags, Plus, Trash2, X } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   getProfileAction,
   updateProfileAction,
@@ -11,6 +12,15 @@ import {
   deleteCategoryAction,
 } from "@/app/dashboard/actions";
 import { IconListGrid, getIcon } from "@/components/icon-list";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Profile {
   name: string;
@@ -49,6 +59,8 @@ export default function SettingsPage() {
   const [savingCat, setSavingCat] = useState(false);
   const [catError, setCatError] = useState("");
   const [catToast, setCatToast] = useState(false);
+  const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
+  const [confirmCatOpen, setConfirmCatOpen] = useState(false);
 
   const loadCategories = () => {
     getCategoriesAction().then(setCategories).catch(() => { });
@@ -75,10 +87,9 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     try {
       await updateProfileAction(profile);
-      setShowSavedToast(true);
-      setTimeout(() => setShowSavedToast(false), 3000);
-    } catch {
-      // ignore
+      toast.success("Profil berhasil diperbarui!");
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal memperbarui profil.");
     }
   };
 
@@ -98,10 +109,10 @@ export default function SettingsPage() {
       setNewPassword("");
       setConfirmPassword("");
       setProfile({ ...profile, has_password: true });
-      setShowPwToast(true);
-      setTimeout(() => setShowPwToast(false), 3000);
-    } catch (e) {
-      setPasswordError(e instanceof Error ? e.message : "Gagal menyimpan kata sandi.");
+      toast.success("Kata sandi berhasil disimpan!");
+    } catch (e: any) {
+      setPasswordError(e?.message || "Gagal menyimpan kata sandi.");
+      toast.error(e?.message || "Gagal menyimpan kata sandi.");
     } finally {
       setSavingPassword(false);
     }
@@ -128,22 +139,33 @@ export default function SettingsPage() {
     setCatError("");
     try {
       await createCategoryAction({ name: catName.trim(), type: catType, iconName: catIconName });
+      toast.success("Kategori berhasil dibuat!");
       closeCatModal();
       loadCategories();
-    } catch {
-      setCatError("Gagal menyimpan kategori.");
+    } catch (err: any) {
+      setCatError(err?.message || "Gagal menyimpan kategori.");
+      toast.error(err?.message || "Gagal menyimpan kategori.");
     } finally {
       setSavingCat(false);
     }
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    if (!confirm("Hapus kategori ini? Transaksi dengan kategori ini akan kehilangan kategori.")) return;
+  const handleDeleteCategoryClick = (id: string) => {
+    setDeleteCatId(id);
+    setConfirmCatOpen(true);
+  };
+
+  const handleConfirmDeleteCategory = async () => {
+    if (!deleteCatId) return;
+    setConfirmCatOpen(false);
     try {
-      await deleteCategoryAction(id);
+      await deleteCategoryAction(deleteCatId);
+      toast.success("Kategori berhasil dihapus!");
       loadCategories();
     } catch (err: any) {
-      alert(err?.message || "Gagal menghapus kategori.");
+      toast.error(err?.message || "Gagal menghapus kategori.");
+    } finally {
+      setDeleteCatId(null);
     }
   };
 
@@ -288,7 +310,7 @@ export default function SettingsPage() {
               <button onClick={handleSavePassword}
                 disabled={savingPassword}
                 className="flex items-center gap-2 px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white transition-all rounded-lg shadow-sm text-xs font-extrabold disabled:opacity-50">
-                {savingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <KeyRound className="w-3.5 h-3.5" />}
+                {savingPassword ? <Spinner size={14} /> : <KeyRound className="w-3.5 h-3.5" />}
                 {profile.has_password ? "Ubah Kata Sandi" : "Buat Kata Sandi"}
               </button>
             </div>
@@ -346,7 +368,7 @@ export default function SettingsPage() {
                         <span className="text-[10px] font-bold text-stone-300">Bawaan</span>
                       ) : (
                         <button
-                          onClick={() => handleDeleteCategory(c.id)}
+                          onClick={() => handleDeleteCategoryClick(c.id)}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-stone-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -382,11 +404,15 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Tipe</label>
-                <select value={catType} onChange={(e) => setCatType(e.target.value as "INCOME" | "EXPENSE")}
-                  className="w-full px-3 py-2.5 bg-[#FAF6F0] border border-[#E7DED4] rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-stone-900 text-xs font-bold">
-                  <option value="EXPENSE">Pengeluaran</option>
-                  <option value="INCOME">Pemasukan</option>
-                </select>
+                <Select value={catType} onValueChange={(val) => setCatType(val as "INCOME" | "EXPENSE")}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih tipe..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
+                    <SelectItem value="INCOME">Pemasukan</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold text-stone-500 uppercase tracking-wider">Ikon</label>
@@ -400,7 +426,7 @@ export default function SettingsPage() {
                 </button>
                 <button type="submit" disabled={savingCat}
                   className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg text-xs font-extrabold disabled:opacity-60">
-                  {savingCat ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  {savingCat ? <Spinner size={14} /> : <Plus className="w-3.5 h-3.5" />}
                   Simpan Kategori
                 </button>
               </div>
@@ -408,6 +434,17 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+      
+      <ConfirmDialog
+        isOpen={confirmCatOpen}
+        title="Hapus Kategori"
+        message="Hapus kategori ini? Transaksi dengan kategori ini akan kehilangan kategori."
+        confirmText="Hapus"
+        cancelText="Batal"
+        onConfirm={handleConfirmDeleteCategory}
+        onCancel={() => setConfirmCatOpen(false)}
+        variant="danger"
+      />
     </div>
   );
 }

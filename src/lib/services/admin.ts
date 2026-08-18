@@ -49,19 +49,24 @@ export async function getAdminUserList(): Promise<AdminUserRow[]> {
     const { rows } = await pool.query(`
         SELECT
           u.id, u.name, u.email,
-          COALESCE(
-            ARRAY[g.name] FILTER (WHERE g.name IS NOT NULL),
-            '{}'
-          )::text[]                                                                  AS group_names,
+          CASE WHEN g.name IS NOT NULL THEN ARRAY[g.name] ELSE ARRAY[]::text[] END    AS group_names,
           u.created_at,
-          COUNT(DISTINCT t.id)::int                                                  AS total_transactions,
-          COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END), 0)::float AS total_income,
-          COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END), 0)::float AS total_expense,
-          MAX(t.date)                                                                AS last_transaction
+          COALESCE(t.total_transactions, 0)::int                                     AS total_transactions,
+          COALESCE(t.total_income, 0)::float                                         AS total_income,
+          COALESCE(t.total_expense, 0)::float                                        AS total_expense,
+          t.last_transaction                                                         AS last_transaction
         FROM users u
         LEFT JOIN user_groups g ON g.id = u.group_id
-        LEFT JOIN transactions t ON t.user_id = u.id
-        GROUP BY u.id, u.name, u.email, u.created_at, g.name
+        LEFT JOIN (
+          SELECT
+            user_id,
+            COUNT(*)::int AS total_transactions,
+            SUM(CASE WHEN type = 'INCOME' THEN amount ELSE 0 END)::float AS total_income,
+            SUM(CASE WHEN type = 'EXPENSE' THEN amount ELSE 0 END)::float AS total_expense,
+            MAX(date) AS last_transaction
+          FROM transactions
+          GROUP BY user_id
+        ) t ON t.user_id = u.id
         ORDER BY u.created_at ASC
     `);
     return rows;
